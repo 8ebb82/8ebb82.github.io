@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>无备份恢复数据库 | 8ebb82&#39;s Web Note</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true });
+</script>
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/posts/">文章</a></li>
+      
+      <li><a href="/tags/">标签</a></li>
+      
+      <li><a href="/categories/">分类</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+    <h1>
+        <span class="title">
+            无备份恢复数据库
+        </span>
+    </h1>
+    
+    <h2 class="date">2025/05/19</h2>
+    <p class="description">没有备份怎么恢复？曲线救国！</p>
+</div>
+
+<main>
+    <h2 id="背景">背景</h2>
+<p>项目基于<a href="https://ruoyi.vip/"> ruoyi 框架</a>二次开发。项目组成员在数据库上运行了 ruoyi 官方提供的 sql 文件，导致系统有关的表格全部被初始内容覆盖，开发过程中所做的更改全部丢失。</p>
+<p>官方的 sql 文件大概长这样：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">DROP</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#66d9ef">IF</span> EXIST <span style="color:#66d9ef">table_name</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#66d9ef">table_name</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">{</span>
+</span></span><span style="display:flex;"><span>    ...
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">}</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> <span style="color:#66d9ef">table_name</span> <span style="color:#66d9ef">VALUES</span>(...);
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p>所以看起来就是被初始数据覆盖了。</p>
+<h2 id="解决">解决</h2>
+<p>询问 ChatGPT，得知可以通过重新执行建库以来所有操作来变相恢复数据。虽然数据库没有备份，但 mysql 会把每一次操作都详细地记录到日志中。</p>
+<h3 id="binlog二进制日志">binlog（二进制日志）</h3>
+<p>首先看看有没有开启 binlog 功能：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mysql&gt; SHOW BINARY LOGS;
+</span></span><span style="display:flex;"><span>+---------------+-----------+-----------+
+</span></span><span style="display:flex;"><span>| Log_name      | File_size | Encrypted |
+</span></span><span style="display:flex;"><span>+---------------+-----------+-----------+
+</span></span><span style="display:flex;"><span>| binlog.000005 | <span style="color:#ae81ff">120630429</span> | No        |
+</span></span><span style="display:flex;"><span>| binlog.000006 |       <span style="color:#ae81ff">180</span> | No        |
+</span></span><span style="display:flex;"><span>| binlog.000007 | <span style="color:#ae81ff">187911145</span> | No        |
+</span></span><span style="display:flex;"><span>+---------------+-----------+-----------+
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">3</span> rows in set <span style="color:#f92672">(</span>0.01 sec<span style="color:#f92672">)</span>
+</span></span></code></pre></div><p>如果有，那就有救。</p>
+<p>文件名后的数字越大表示这个日志文件越新。自行根据数据库出现异常的时间来确定文件。</p>
+<h3 id="导出并分析日志">导出并分析日志</h3>
+<p>先确定日志文件的路径：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mysql -u root -p -e <span style="color:#e6db74">&#34;SHOW VARIABLES LIKE &#39;log_bin_basename&#39;;&#34;</span>
+</span></span></code></pre></div><p>然后导出：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mysqlbinlog --database<span style="color:#f92672">=</span>ry /var/lib/mysql/binlog.000007 --base64-output<span style="color:#f92672">=</span>DECODE-ROWS -v &gt; log_000007.sql
+</span></span></code></pre></div><p>可以用 <code>--database</code> 指定导出哪个数据库的日志，这里以 ry 为例。</p>
+<p>然后用文本编辑器打开，定位到数据库出现异常那一步操作，这里是表格被删除：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>#250517 15:36:59 server id 1  end_log_pos 38173938 CRC32 0x39ca14e2     Query   thread_id=12245 exec_time=0     error_code=0    Xid =
+</span></span><span style="display:flex;"><span> 297446
+</span></span><span style="display:flex;"><span>SET TIMESTAMP=1747467419/*!*/;
+</span></span><span style="display:flex;"><span>SET @@session.pseudo_thread_id=12245/*!*/;
+</span></span><span style="display:flex;"><span>DROP TABLE IF EXISTS `QRTZ_FIRED_TRIGGERS` /* generated by server */
+</span></span><span style="display:flex;"><span>/*!*/;
+</span></span><span style="display:flex;"><span># at 38173938
+</span></span></code></pre></div><p>可以看到在 <code># at 38173938</code> 这个地方开始执行删除，记住这个地方。出现异常的位置越精确，恢复的数据越多.</p>
+<h3 id="导出指定位置前的-sql">导出指定位置前的 sql</h3>
+<p>确定了异常操作的位置，我们就可以导出其之前的语句来用于恢复数据了。</p>
+<p>以前文为例，bash 命令：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mysqlbinlog --database<span style="color:#f92672">=</span>ry --stop-position<span style="color:#f92672">=</span><span style="color:#ae81ff">38173938</span> /var/lib/mysql/binlog.000007 &gt; restore_000007.sql
+</span></span></code></pre></div><p>这样即可导出删除操作之前的所有操作，不过只是这个日志文件中的。如果在这个日志文件之前还有其他日志文件，那么那些日志文件也需要导出，并且是全部导出（因为之前的操作没出异常）。</p>
+<h3 id="恢复数据">恢复数据</h3>
+<p>导出完文件后，合并文件：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>cat restore_000005.sql restore_000006.sql restore_000007.sql &gt; restore_full.sql
+</span></span></code></pre></div><p>接下来执行恢复操作：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mysql -u root -p &lt; restore_full.sql
+</span></span></code></pre></div><p>注意，每次执行恢复之前都需要先删除原有的数据库（如果存在），因为恢复文件中执行的操作不会处理“xx已存在”之类的异常（参考前面提到的 ruoyi 官方的 sql 文件）。</p>
+<p>执行过程中可能会报错，删掉报错那一行即可。</p>
+<p>最后成功恢复了 94% 的数据，因为执行到这里报错了。可以重复以上步骤来执行完整个恢复文件，但是那样太花时间。</p>
+<h2 id="教训">教训</h2>
+<p>生命诚可贵，数据价更高。为了防止再出现“数据丢失但是没有备份”这种事故，编写一个数据库全量备份脚本：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 设置变量</span>
+</span></span><span style="display:flex;"><span>backup_dir<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/your/db_backup/dir&#34;</span>
+</span></span><span style="display:flex;"><span>log_file<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/your/backup.log&#34;</span>
+</span></span><span style="display:flex;"><span>db_name<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;ry&#34;</span> <span style="color:#75715e"># 要备份的数据库的名字</span>
+</span></span><span style="display:flex;"><span>db_user<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;root&#34;</span>
+</span></span><span style="display:flex;"><span>db_pass<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;xxxxxx&#34;</span>
+</span></span><span style="display:flex;"><span>date_str<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>date +<span style="color:#e6db74">&#34;%Y-%m-%d&#34;</span><span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>backup_file<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>backup_dir<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span>db_name<span style="color:#e6db74">}</span><span style="color:#e6db74">_</span><span style="color:#e6db74">${</span>date_str<span style="color:#e6db74">}</span><span style="color:#e6db74">.sql&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 创建备份目录（如果不存在）</span>
+</span></span><span style="display:flex;"><span>mkdir -p <span style="color:#e6db74">&#34;</span>$backup_dir<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 写入日志头</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;[</span><span style="color:#66d9ef">$(</span>date <span style="color:#e6db74">&#39;+%F %T&#39;</span><span style="color:#66d9ef">)</span><span style="color:#e6db74">] 开始备份数据库 </span>$db_name<span style="color:#e6db74"> ...&#34;</span> &gt;&gt; <span style="color:#e6db74">&#34;</span>$log_file<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 执行备份</span>
+</span></span><span style="display:flex;"><span>mysqldump -u <span style="color:#e6db74">&#34;</span>$db_user<span style="color:#e6db74">&#34;</span> -p<span style="color:#e6db74">&#34;</span>$db_pass<span style="color:#e6db74">&#34;</span> --databases <span style="color:#e6db74">&#34;</span>$db_name<span style="color:#e6db74">&#34;</span> &gt; <span style="color:#e6db74">&#34;</span>$backup_file<span style="color:#e6db74">&#34;</span> 2&gt;&gt;<span style="color:#e6db74">&#34;</span>$log_file<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 检查是否成功</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> $? -eq <span style="color:#ae81ff">0</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>  echo <span style="color:#e6db74">&#34;[</span><span style="color:#66d9ef">$(</span>date <span style="color:#e6db74">&#39;+%F %T&#39;</span><span style="color:#66d9ef">)</span><span style="color:#e6db74">] 备份成功：</span>$backup_file<span style="color:#e6db74">&#34;</span> &gt;&gt; <span style="color:#e6db74">&#34;</span>$log_file<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>  echo <span style="color:#e6db74">&#34;[</span><span style="color:#66d9ef">$(</span>date <span style="color:#e6db74">&#39;+%F %T&#39;</span><span style="color:#66d9ef">)</span><span style="color:#e6db74">] 备份失败&#34;</span> &gt;&gt; <span style="color:#e6db74">&#34;</span>$log_file<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 删除 7 天前的备份文件</span>
+</span></span><span style="display:flex;"><span>find <span style="color:#e6db74">&#34;</span>$backup_dir<span style="color:#e6db74">&#34;</span> -name <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>db_name<span style="color:#e6db74">}</span><span style="color:#e6db74">_*.sql&#34;</span> -type f -mtime +6 -exec rm -f <span style="color:#f92672">{}</span> <span style="color:#ae81ff">\;</span> &gt;&gt; <span style="color:#e6db74">&#34;</span>$log_file<span style="color:#e6db74">&#34;</span> 2&gt;&amp;<span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>编辑 crontab 以添加为自动任务：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>crontab -e
+</span></span></code></pre></div><p>加上这一行：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">2</span> * * * /your/db_backup/script.sh
+</span></span></code></pre></div><p>意思是每天两点执行一次这个备份脚本。</p>
+<h2 id="special-thanks">Special Thanks</h2>
+<p><a href="https://chatgpt.com/">OpenAI:ChatGPT</a></p>
+
+</main>
+
+  <footer>
+  
+  
+  <hr/>
+  © 2026 8ebb82&rsquo;s Web Note. Powered by <a href="https://gohugo.io">Hugo</a>.
+  
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Intent 意图 | xici&#39;s Web Note</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true });
+</script>
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/posts/">文章</a></li>
+      
+      <li><a href="/tags/">标签</a></li>
+      
+      <li><a href="/categories/">分类</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+    <h1>
+        <span class="title">
+            Intent 意图
+        </span>
+    </h1>
+    
+    <h2 class="date">2025/03/15</h2>
+    
+</div>
+
+<main>
+    <h1 id="intent-意图">Intent 意图</h1>
+<ul>
+<li>在 Acitvity 之间跳转</li>
+<li>传递数据</li>
+<li>启动其他应用的 Activity</li>
+</ul>
+<p>能被外部启动的 Activity 都需要在 AndroidManifest.xml 文件中注册 <code>android:exported=&quot;true&quot;</code> 属性。</p>
+<h2 id="显式-intent">显式 Intent</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">val</span> intent = Intent(<span style="color:#66d9ef">this</span>, TargetActivity<span style="color:#f92672">::</span><span style="color:#66d9ef">class</span>.java)
+</span></span><span style="display:flex;"><span>startActivity(intent)
+</span></span></code></pre></div><p><code>Intent</code> 构造函数的参数：</p>
+<ol>
+<li>上下文</li>
+<li>目标活动的类名</li>
+</ol>
+<p><code>SecondActivity::class.java</code> 相当于 java 中 <code>SecondActivity.class</code> 的写法。</p>
+<h2 id="隐式-intent">隐式 Intent</h2>
+<p>如果一个活动可以被隐式调用，需要在 AndroidManifest.xml 文件中注册：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;activity</span> <span style="color:#a6e22e">android:name=</span><span style="color:#e6db74">&#34;.TargetActivity&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;intent-filter&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;action</span> <span style="color:#a6e22e">android:name=</span><span style="color:#e6db74">&#34;com.example.activitytest.ACTION_START&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;category</span> <span style="color:#a6e22e">android:name=</span><span style="color:#e6db74">&#34;android.intent.category.DEFAULT&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">&lt;!-- &lt;category android:name=&#34;com.example.activitytest.MY_CATEGORY&#34;/&gt; --&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">&lt;!-- action 只能有一个， category 可以有多个--&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/intent-filter&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/activity&gt;</span>
+</span></span></code></pre></div><p>调用：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">val</span> intent = Intent(<span style="color:#e6db74">&#34;com.example.activitytest.ACTION_START&#34;</span>)
+</span></span><span style="display:flex;"><span>startActivity(intent)
+</span></span></code></pre></div><p>一个 Intent 可以指定一个 action 和多个 category，只有当 action 和 category 全部匹配时，意图才会被响应。</p>
+<h2 id="传递数据">传递数据</h2>
+<p>活动1存放数据：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">val</span> intent = Intent(<span style="color:#66d9ef">this</span>, TargetActivity<span style="color:#f92672">::</span><span style="color:#66d9ef">class</span>.java)
+</span></span><span style="display:flex;"><span>intent.putExtra(<span style="color:#e6db74">&#34;extra_data&#34;</span>, <span style="color:#e6db74">&#34;Hello, TargetActivity&#34;</span>) <span style="color:#75715e">// key-value
+</span></span></span><span style="display:flex;"><span>startActivity(intent)
+</span></span></code></pre></div><p>活动2提取数据：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">val</span> extraData = intent.getStringExtra(<span style="color:#e6db74">&#34;extra_data&#34;</span>)
+</span></span></code></pre></div><h1 id="隐式传递的更多用法">隐式传递的更多用法</h1>
+<p>安卓系统中有一个内置 action <code>Intent.ACTION_VIEW</code> 可以打开浏览器：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">val</span> intent = Intent(<span style="color:#a6e22e">Intent</span>.ACTION_VIEW)
+</span></span><span style="display:flex;"><span>intent.<span style="color:#66d9ef">data</span> = <span style="color:#a6e22e">Uri</span>.parse(<span style="color:#e6db74">&#34;http://www.baidu.com&#34;</span>) <span style="color:#75715e">// 设置网址，可选
+</span></span></span><span style="display:flex;"><span>startActivity(intent)
+</span></span></code></pre></div><p>当一个活动在 AndroidManifest.xml 中注册了 action 为 <code>Intent.ACTION_VIEW</code> 时，那么这个活动就可以响应打开网页的请求。</p>
+<p>同时，还可以 <code>intent-filter</code> 标签中再配置一个 <code>data</code> 标签，用于更精确地指定当前 Activity 能够响应的数据。data 标签中主要可以配置以下内容：</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: center">属性</th>
+          <th style="text-align: center">说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center"><code>android:scheme</code></td>
+          <td style="text-align: center">指定协议</td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>android:host</code></td>
+          <td style="text-align: center">指定主机名</td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>android:port</code></td>
+          <td style="text-align: center">指定端口</td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>android:path</code></td>
+          <td style="text-align: center">指定访问路径</td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>android:mimeType</code></td>
+          <td style="text-align: center">指定可以处理的数据类型，允许使用通配符</td>
+      </tr>
+  </tbody>
+</table>
+<p>只有当 data 标签中指定的内容和 Intent 中携带的 Data 完全一致时，当前 Activity 才能够响应该 Intent 。</p>
+<blockquote>
+<p>如果所有配置都正确，但是跳转的时候打开了系统默认的浏览器，将其禁用再尝试是否可以正常接收跳转浏览器的意图。</p>
+</blockquote>
+<h1 id="返回数据给上一个活动">返回数据给上一个活动</h1>
+<p>在父活动中使用 <code>startActivityForResult</code> 方法启动子活动：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">val</span> intent = Intent(<span style="color:#66d9ef">this</span>, TargetActivity<span style="color:#f92672">::</span><span style="color:#66d9ef">class</span>.java)
+</span></span><span style="display:flex;"><span>startActivityForResult(intent, <span style="color:#ae81ff">1</span>) <span style="color:#75715e">// 1 是请求码，用于在之后的回调中判断数据来源
+</span></span></span></code></pre></div><p>子活动返回数据：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#75715e">// 主逻辑
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">val</span> intent = Intent()
+</span></span><span style="display:flex;"><span>intent.putExtra(<span style="color:#e6db74">&#34;data_return&#34;</span>, <span style="color:#e6db74">&#34;Hello, MainActivity&#34;</span>)
+</span></span><span style="display:flex;"><span>setResult(RESULT_OK, intent)
+</span></span><span style="display:flex;"><span>finish() <span style="color:#75715e">// 销毁当前活动
+</span></span></span></code></pre></div><p>父活动接收数据：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">override</span> <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">onActivityResult</span>(requestCode: Int, resultCode: Int, <span style="color:#66d9ef">data</span>: Intent?) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">when</span> (requestCode) {
+</span></span><span style="display:flex;"><span>        <span style="color:#ae81ff">1</span> <span style="color:#f92672">-&gt;</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (resultCode <span style="color:#f92672">==</span> <span style="color:#a6e22e">Activity</span>.RESULT_OK) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">val</span> returnedData = <span style="color:#66d9ef">data</span><span style="color:#f92672">?.</span>getStringExtra(<span style="color:#e6db74">&#34;data_return&#34;</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Log</span>.d(<span style="color:#e6db74">&#34;MainActivity&#34;</span>, <span style="color:#e6db74">&#34;returned data is </span><span style="color:#e6db74">$returnedData</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>通过返回键返回时，子活动中重写 <code>onBackPressed</code> 方法即可：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">override</span> <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">onBackPressed</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// code...
+</span></span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div>
+</main>
+
+  <footer>
+  
+  
+  <hr/>
+  © 2026 xici&rsquo;s Web Note. Powered by <a href="https://gohugo.io">Hugo</a>.
+  
+  </footer>
+  </body>
+</html>

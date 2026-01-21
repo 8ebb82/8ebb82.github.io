@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>常用布局 | xici&#39;s Web Note</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true });
+</script>
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/posts/">文章</a></li>
+      
+      <li><a href="/tags/">标签</a></li>
+      
+      <li><a href="/categories/">分类</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+    <h1>
+        <span class="title">
+            常用布局
+        </span>
+    </h1>
+    
+    <h2 class="date">2025/03/30</h2>
+    
+</div>
+
+<main>
+    <h1 id="常用布局">常用布局</h1>
+<h2 id="linearlayout">LinearLayout</h2>
+<p>线性布局，元素呈线性排列，不多解释。</p>
+<p><code>android:orientation</code> 属性可以指定控件的排列方式，默认为水平排列。</p>
+<p>控件常用属性：</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: center">属性名</th>
+          <th style="text-align: center">值</th>
+          <th style="text-align: center">说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">android:layout_gravity</td>
+          <td style="text-align: center">top,bottom,left,right</td>
+          <td style="text-align: center">对齐方向</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="relativelayout">RelativeLayout</h2>
+<p>相对布局，元素可以相对于父容器确定位置，也可以相对于其他控件。</p>
+<p>控件常用属性：</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: center">属性名</th>
+          <th style="text-align: center">值</th>
+          <th style="text-align: center">说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">android:layout_centerInParent</td>
+          <td style="text-align: center">boolean</td>
+          <td style="text-align: center">处于父容器中心</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">android:layout_alignParentTop</td>
+          <td style="text-align: center">boolean</td>
+          <td style="text-align: center">与父容器顶部对齐</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">android:layout_alignParentBottom</td>
+          <td style="text-align: center">boolean</td>
+          <td style="text-align: center">与父容器底部对齐</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">android:layout_alignParentLeft</td>
+          <td style="text-align: center">boolean</td>
+          <td style="text-align: center">与父容器左边对齐</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">android:layout_alignParentRight</td>
+          <td style="text-align: center">boolean</td>
+          <td style="text-align: center">与父容器右边对齐</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">android:layout_above</td>
+          <td style="text-align: center">控件引用</td>
+          <td style="text-align: center">位于控件上方</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">android:layout_below</td>
+          <td style="text-align: center">控件引用</td>
+          <td style="text-align: center">位于控件下方</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">android:layout_toLeftOf</td>
+          <td style="text-align: center">控件引用</td>
+          <td style="text-align: center">位于控件左侧</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">android:layout_toRightOf</td>
+          <td style="text-align: center">控件引用</td>
+          <td style="text-align: center">位于控件右侧</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">android:layout_alignTop</td>
+          <td style="text-align: center">控件引用</td>
+          <td style="text-align: center">与控件上边缘对齐</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">android:layout_alignBottom</td>
+          <td style="text-align: center">控件引用</td>
+          <td style="text-align: center">与控件下边缘对齐</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">android:layout_alignLeft</td>
+          <td style="text-align: center">控件引用</td>
+          <td style="text-align: center">与控件左边缘对齐</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">android:layout_alignRight</td>
+          <td style="text-align: center">控件引用</td>
+          <td style="text-align: center">与控件右边缘对齐</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="framelayout">FrameLayout</h2>
+<p>帧布局。不够灵活，应用较少。</p>
+<h1 id="自定义控件">自定义控件</h1>
+<p>安卓中的布局与控件的继承关系：</p>
+<div class="mermaid">
+    
+graph TD
+  View --> TextView
+  View --> ImageView
+  View --> ViewGroup
+  TextView --> EditText
+  TextView --> Button
+  ViewGroup --> LinearLayout
+  ViewGroup --> RelativeLayout
+  ViewGroup --> Others[111]
+  View --> TextView
+  View --> ImageView
+  View --> ViewGroup 
+
+</div>
+<p>View是Android中最基本的一种UI组件，它可以在屏幕上绘制一块矩形区域，并能响应这块区域的各种事件。</p>
+<p>ViewGroup是一种特殊的View，它可以包含很多子View和子ViewGroup，是一个用于放置控件和布局的容器。</p>
+<h2 id="步骤">步骤</h2>
+<p>布局与布局之间是可以相互嵌套的；控件必须依赖于布局。所以实际上就是自定义布局，其中有自定义的控件。</p>
+<div class="mermaid">
+    
+graph LR
+    xml文件设计布局 --> |加载| A[class文件控制逻辑]
+    A --> |完整类路径| 其他布局文件中引入
+
+</div>
+<ul>
+<li>编写一个 class 作为逻辑控制，并与自定义的布局绑定（在 class 文件中编写加载布局等逻辑）。</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">YourLayout</span>(context: Context, attrs: AttributeSet) : LinearLayout(context, attrs) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 如果自定义控件依赖于 LinearLayout 布局，那么对应的 class 也继承于 LinearLayout 类。
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">init</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">LayoutInflater</span>.from(context).inflate(<span style="color:#a6e22e">R</span>.layout.title, <span style="color:#66d9ef">this</span>) <span style="color:#75715e">// 绑定自定义的布局
+</span></span></span><span style="display:flex;"><span>       <span style="color:#75715e">// code ...
+</span></span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ul>
+<li>在布局中引入。需要写入完整的类路径。</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;com.example.YourPackage.YourLayout</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">...</span> <span style="color:#f92672">/&gt;</span>
+</span></span></code></pre></div>
+</main>
+
+  <footer>
+  
+  
+  <hr/>
+  © 2026 xici&rsquo;s Web Note. Powered by <a href="https://gohugo.io">Hugo</a>.
+  
+  </footer>
+  </body>
+</html>

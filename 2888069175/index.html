@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>windows 本地部署 photoPrism | xici&#39;s Web Note</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true });
+</script>
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/posts/">文章</a></li>
+      
+      <li><a href="/tags/">标签</a></li>
+      
+      <li><a href="/categories/">分类</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+    <h1>
+        <span class="title">
+            windows 本地部署 photoPrism
+        </span>
+    </h1>
+    
+    <h2 class="date">2025/03/11</h2>
+    
+</div>
+
+<main>
+    <h2 id="起因">起因</h2>
+<p>把带地理位置信息的照片上传到 google 相册后，可以在地图中查看每张照片在地图上的标点。但是 google 相册云空间有限；使用 mod 的话总感觉有风险；并且上传照片到云上也怕隐私泄露（ google 之前拿用户照片来训练 ai ）。</p>
+<p>安卓端开源的 <a href="https://github.com/deckerst/aves">Aves 相册</a> 也有这个功能，但是照片必须在手机上。</p>
+<p>在网上搜索开源照片管理工具，找到了这篇 <a href="https://www.cnblogs.com/ryanyangcs/p/18322866">云部署教程</a> 推荐。</p>
+<h2 id="photoprism-介绍">photoPrism 介绍</h2>
+<ul>
+<li>开源</li>
+<li>足迹地图</li>
+<li>基本的 AI 分类</li>
+</ul>
+<h2 id="部署">部署</h2>
+<p>首先需要安装 Docker Desktop ，这里不赘述。</p>
+<p>接着下载<code>compose.yaml</code>文件。打开 <a href="https://www.photoprism.app/plus/kb/quickstart">官方文档</a>，找到 <a href="https://www.photoprism.app/plus/kb/quickstart#:~:text=Step%201%3A%20Customize%20Configuration">Step 1: Customize Configuration 部分</a>，点击 windows 右边的下载链接，下载 <code>compose.yaml</code> 文件。</p>
+<p>在配置文件的路径下打开 cmd 。接下来的命令会在配置文件的路径下创建 photoPrism 实例。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 拉取镜像并启动，后台运行</span>
+</span></span><span style="display:flex;"><span>docker compose up -d
+</span></span></code></pre></div><p>photoPrism 默认运行在 <a href="localhost:2342">本地 2342 端口</a>。启动后打开浏览器， 等待界面加载完毕。登录的账号密码为：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-plaintext" data-lang="plaintext"><span style="display:flex;"><span>账号：admin
+</span></span><span style="display:flex;"><span>密码：insecure
+</span></span></code></pre></div><p>后续可以在配置文件中修改：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span><span style="color:#f92672">environment</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">PHOTOPRISM_ADMIN_USER</span>: <span style="color:#e6db74">&#34;admin&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">PHOTOPRISM_ADMIN_PASSWORD</span>: <span style="color:#e6db74">&#34;insecure&#34;</span>
+</span></span></code></pre></div><p>登陆后，点击左边侧边栏中的 Settings ，之后在右上角找到 language ，可以将界面改为中文。</p>
+<h2 id="加载已有图片">加载已有图片</h2>
+<p>打开配置文件，转到 95 行，可以看到 photoprism 的文件挂载路径。将 <code>~/Photos:/photoprism/originals</code> 其中的 <code>~/Photos</code> 修改为需要加载的照片文件的路径。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span><span style="color:#f92672">volumes</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># &#34;C:/user/username/folder:/photoprism/folder&#34;       # example</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#e6db74">&#34;~/Pictures:/photoprism/originals&#34;</span>                 <span style="color:#75715e"># original media files (photos and videos)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># - &#34;D:/example/family:/photoprism/originals/family&#34; # *additional* media folders can be mounted like this</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># - &#34;E:/:/photoprism/import&#34;                         # *optional* base folder from which files can be imported to originals</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#e6db74">&#34;./storage:/photoprism/storage&#34;</span>                    <span style="color:#75715e"># *writable* storage folder for cache, database, and sidecar files (never remove)</span>
+</span></span></code></pre></div><p>重新启动 photoPrism （可以在 Docker Desktop 中手动重启）。</p>
+<p>点击侧边栏的资料库，确认顶部 tab 栏的选项卡为索引，点击开始，等待加载完毕即可。加载时间取决于电脑性能以及照片数量。</p>
+<hr>
+<p>参考文档</p>
+<p><a href="https://www.cnblogs.com/ryanyangcs/p/18322866">米开朗基杨的博客</a></p>
+<p><a href="https://www.photoprism.app/plus/kb/quickstart">photoPrism 官方文档</a></p>
+
+</main>
+
+  <footer>
+  
+  
+  <hr/>
+  © 2026 xici&rsquo;s Web Note. Powered by <a href="https://gohugo.io">Hugo</a>.
+  
+  </footer>
+  </body>
+</html>

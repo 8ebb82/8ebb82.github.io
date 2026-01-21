@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PowerShell：在此系统上禁止运行脚本 | 8ebb82&#39;s Web Note</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true });
+</script>
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/posts/">文章</a></li>
+      
+      <li><a href="/tags/">标签</a></li>
+      
+      <li><a href="/categories/">分类</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+    <h1>
+        <span class="title">
+            PowerShell：在此系统上禁止运行脚本
+        </span>
+    </h1>
+    
+    <h2 class="date">2025/03/10</h2>
+    
+</div>
+
+<main>
+    <p>查看当前用户的执行策略：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>get-executionpolicy
+</span></span></code></pre></div><p>返回 <code>Restricted</code> （默认）则是无法执行脚本。</p>
+<p>解除限制：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>set-executionpolicy remotesigned
+</span></span></code></pre></div><p>如果运行后提示：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>Windows PowerShell 已成功更新你的执行策略<span style="color:#960050;background-color:#1e0010">，</span>但在更具体的作业域中定义的策略覆盖该设置了<span style="color:#960050;background-color:#1e0010">。</span>由于发生覆盖<span style="color:#960050;background-color:#1e0010">，</span>你的外壳程序将保留当前的有效执行策略受限制<span style="color:#960050;background-color:#1e0010">。</span>
+</span></span></code></pre></div><p>说明当前用户的策略还未更改，继续执行：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+</span></span></code></pre></div><p>再次查看当前用户的执行策略，发现已更改。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>&gt; get-executionpolicy
+</span></span><span style="display:flex;"><span>RemoteSigned
+</span></span></code></pre></div><p>之后就可以执行脚本了。</p>
+<hr>
+<p>参考文章</p>
+<p><a href="https://syxdevcode.github.io/2021/09/04/PowerShell%EF%BC%9A%E5%9B%A0%E4%B8%BA%E5%9C%A8%E6%AD%A4%E7%B3%BB%E7%BB%9F%E4%B8%8A%E7%A6%81%E6%AD%A2%E8%BF%90%E8%A1%8C%E8%84%9A%E6%9C%AC%EF%BC%8C%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/">syxdevcode 的博客</a></p>
+<p><a href="https://smallsquare.github.io/Powershell-disable-runing-scripts/">tsmallsquare 的博客</a></p>
+
+</main>
+
+  <footer>
+  
+  
+  <hr/>
+  © 2026 8ebb82&rsquo;s Web Note. Powered by <a href="https://gohugo.io">Hugo</a>.
+  
+  </footer>
+  </body>
+</html>

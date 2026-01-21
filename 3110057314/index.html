@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ruoyi-前后端分离版 | 8ebb82&#39;s Web Note</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true });
+</script>
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/posts/">文章</a></li>
+      
+      <li><a href="/tags/">标签</a></li>
+      
+      <li><a href="/categories/">分类</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+    <h1>
+        <span class="title">
+            ruoyi-前后端分离版
+        </span>
+    </h1>
+    
+    <h2 class="date">2025/04/11</h2>
+    <p class="description">本地打包并部署</p>
+</div>
+
+<main>
+    <h1 id="打包环境">打包环境</h1>
+<p>具体版本依项目而定：</p>
+<ul>
+<li>Node.js</li>
+<li>Maven</li>
+<li><a href="https://hx.dcloud.net.cn/cli/README">HBuilderX CLI 命令行工具</a></li>
+<li>Java</li>
+</ul>
+<h1 id="后端部署">后端部署</h1>
+<p>若依官方提供了一键打包脚本，运行即可：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>./ruoyi-admin/bin/package.bat
+</span></span></code></pre></div><p>打包后在 <code>ruoyi-admin/target</code> 目录下生成 <code>ruoyi-admin.jar</code> 包（多模块版本），使用若依官方脚本运行：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>./ruoyi-admin/bin/run.bat
+</span></span></code></pre></div><p>或是手动运行：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>java –jar ruoyi-admin.jar
+</span></span></code></pre></div><h1 id="前端部署">前端部署</h1>
+<h2 id="web-端">web 端</h2>
+<p>在项目根目录下执行打包命令：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 打包正式环境</span>
+</span></span><span style="display:flex;"><span>npm run build:prod
+</span></span></code></pre></div><p>打包后，在 <code>项目根目录/dist</code> 目录下生成站点文件，文件结构如下所示：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-plaintext" data-lang="plaintext"><span style="display:flex;"><span>项目根目录/dist:
+</span></span><span style="display:flex;"><span>├─html
+</span></span><span style="display:flex;"><span>├─static
+</span></span><span style="display:flex;"><span>│  ├─css
+</span></span><span style="display:flex;"><span>│  ├─fonts
+</span></span><span style="display:flex;"><span>│  ├─img
+</span></span><span style="display:flex;"><span>│  └─js
+</span></span><span style="display:flex;"><span>├─favicon.ico
+</span></span><span style="display:flex;"><span>├─index.html
+</span></span><span style="display:flex;"><span>├─index.html.gz
+</span></span><span style="display:flex;"><span>├─robots.txt
+</span></span><span style="display:flex;"><span>└─styles
+</span></span><span style="display:flex;"><span>    └─theme-chalk
+</span></span></code></pre></div><p>接着部署到 nginx ，若依官方提供了完整的<a href="https://doc.ruoyi.vip/ruoyi-vue/document/hjbs.html#nginx%E9%85%8D%E7%BD%AE">配置文件</a>。注意修改配置文件中 <code>root</code> 的路径。</p>
+<p>建议使用 Unix 风格的文件路径，否则文件路径中的<strong>特殊字符</strong>（比如 <code>\r</code> ）会导致 nginx <strong>无法正常访问资源</strong>（500 错误）。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#f92672">- Windows\style\file\path
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+ Unix/style/file/path
+</span></span></span></code></pre></div><h2 id="app-端">app 端</h2>
+<p>打包前需要<strong>在 HBuilderX 中登录 Dcloud 帐号并绑定手机号</strong>。</p>
+<p><strong>项目根目录下</strong>执行打包命令：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>cli publish --platform h5 --project ruoyi-app
+</span></span></code></pre></div><p>这里的 <code>cli</code> 命令是 <code>cli.exe</code>，在 HbuilderX 的安装路径下。 <code>ruoyi-app</code> 替换为实际的<strong>项目根目录名称</strong>。</p>
+<p>第一次打包可能会遇到<strong>非项目所有者</strong>的问题：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>此应用 DCloud appid 为 __UNI__XXXXXXX ，您不是这个应用的项目成员。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>1、联系这个应用的所有者，请求加入项目成员（https://dev.dcloud.net.cn &#34;成员管理&#34;-&#34;添加项目成员&#34;）；
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>2、重新在manifest.json中生成自己的APPID；
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>3、联系应用所有者将此 DCloud appid 转让给当前账号。
+</span></span></code></pre></div><p>根据报错提示，在项目根目录下的 <code>manifest.json</code> 中重新生成 <code>AppID</code> 即可。</p>
+<p>打包完毕后，在 <code>项目根目录\unpackage\dist\build\web</code> 下生成打包文件。</p>
+<p>部署到 nginx 。若依官方提供了完整的<a href="https://doc.ruoyi.vip/ruoyi-app/document/hjbs.html#nginx%E9%85%8D%E7%BD%AE">配置文件</a>。</p>
+<h1 id="建议的-nginx-配置文件写法">建议的 nginx 配置文件写法</h1>
+<p>使用<strong>主配置文件 include 子配置文件</strong>的写法。</p>
+<h2 id="nginx-主配置默认配置">nginx 主配置（默认配置）</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nginx" data-lang="nginx"><span style="display:flex;"><span><span style="color:#66d9ef">worker_processes</span>  <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">events</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">worker_connections</span>  <span style="color:#ae81ff">1024</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">http</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">default_type</span>  <span style="color:#e6db74">application/octet-stream</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">sendfile</span>      <span style="color:#66d9ef">on</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">keepalive_timeout</span>  <span style="color:#ae81ff">65</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">include</span>       <span style="color:#e6db74">mime.types</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">include</span>       <span style="color:#e6db74">ruoyi-web.conf</span>; <span style="color:#75715e"># 项目配置作为子配置引入
+</span></span></span><span style="display:flex;"><span>  <span style="color:#f92672">include</span>       <span style="color:#e6db74">ruoyi-app.conf</span>; <span style="color:#75715e"># 项目配置作为子配置引入
+</span></span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="ruoyi-web-项目配置">ruoyi-web 项目配置</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nginx" data-lang="nginx"><span style="display:flex;"><span><span style="color:#66d9ef">server</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">listen</span>       <span style="color:#ae81ff">80</span>; <span style="color:#75715e"># 服务端口
+</span></span></span><span style="display:flex;"><span>  <span style="color:#f92672">server_name</span>  <span style="color:#e6db74">localhost</span>; <span style="color:#75715e"># 服务器地址
+</span></span></span><span style="display:flex;"><span>  <span style="color:#f92672">charset</span>      <span style="color:#e6db74">utf-8</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># 前端页面入口
+</span></span></span><span style="display:flex;"><span>  <span style="color:#f92672">location</span> <span style="color:#e6db74">/</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">root</span>   <span style="color:#e6db74">your/path/to/file</span>; <span style="color:#75715e"># 站点根目录，替换为实际路径
+</span></span></span><span style="display:flex;"><span>    <span style="color:#f92672">index</span>  <span style="color:#e6db74">index.html</span> <span style="color:#e6db74">index.htm</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">try_files</span> $uri $uri/ <span style="color:#e6db74">/index.html</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># 接口代理转发（前端 axios 请求接口 /prod-api 转发给后端）
+</span></span></span><span style="display:flex;"><span>  <span style="color:#f92672">location</span> <span style="color:#e6db74">/prod-api/</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">proxy_set_header</span> <span style="color:#e6db74">Host</span> $http_host;
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">proxy_set_header</span> <span style="color:#e6db74">X-Real-IP</span> $remote_addr;
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">proxy_set_header</span> <span style="color:#e6db74">REMOTE-HOST</span> $remote_addr;
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">proxy_set_header</span> <span style="color:#e6db74">X-Forwarded-For</span> $proxy_add_x_forwarded_for;
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">proxy_pass</span> <span style="color:#e6db74">http://localhost:8080/</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># 错误页配置
+</span></span></span><span style="display:flex;"><span>  <span style="color:#f92672">error_page</span>   <span style="color:#ae81ff">500</span> <span style="color:#ae81ff">502</span> <span style="color:#ae81ff">503</span> <span style="color:#ae81ff">504</span>  <span style="color:#e6db74">/50x.html</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">location</span> = <span style="color:#e6db74">/50x.html</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">root</span>   <span style="color:#e6db74">html</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="ruoyi-app-配置">ruoyi-app 配置</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nginx" data-lang="nginx"><span style="display:flex;"><span><span style="color:#66d9ef">server</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">listen</span>       <span style="color:#ae81ff">81</span>; <span style="color:#75715e"># 服务端口
+</span></span></span><span style="display:flex;"><span>  <span style="color:#f92672">server_name</span>  <span style="color:#e6db74">localhost</span>; <span style="color:#75715e"># 服务器地址
+</span></span></span><span style="display:flex;"><span>  <span style="color:#f92672">charset</span> <span style="color:#e6db74">utf-8</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">location</span> <span style="color:#e6db74">/</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">root</span>   <span style="color:#e6db74">your/path/to/file</span>; <span style="color:#75715e"># 站点根目录，替换为实际路径
+</span></span></span><span style="display:flex;"><span>    <span style="color:#f92672">try_files</span> $uri $uri/ <span style="color:#e6db74">/index.html</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">index</span>  <span style="color:#e6db74">index.html</span> <span style="color:#e6db74">index.htm</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># 默认所有路径
+</span></span></span><span style="display:flex;"><span>  <span style="color:#f92672">location</span> <span style="color:#e6db74">/prod-api/</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">proxy_set_header</span> <span style="color:#e6db74">Host</span> $http_host;
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">proxy_set_header</span> <span style="color:#e6db74">X-Real-IP</span> $remote_addr;
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">proxy_set_header</span> <span style="color:#e6db74">REMOTE_HOST</span> $remote_addr;
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">proxy_set_header</span> <span style="color:#e6db74">X-Forwarded-For</span> $proxy_add_x_forwarded_for;
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">proxy_set_header</span> <span style="color:#e6db74">X-Forwarded-Proto</span> $scheme;
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">proxy_set_header</span> <span style="color:#e6db74">X-NginX-Proxy</span> <span style="color:#e6db74">true</span>;
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 反向代理配置
+</span></span></span><span style="display:flex;"><span>    <span style="color:#f92672">proxy_pass</span> <span style="color:#e6db74">http://localhost:8080/</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">error_page</span>   <span style="color:#ae81ff">500</span> <span style="color:#ae81ff">502</span> <span style="color:#ae81ff">503</span> <span style="color:#ae81ff">504</span>  <span style="color:#e6db74">/50x.html</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">location</span> = <span style="color:#e6db74">/50x.html</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">root</span>   <span style="color:#e6db74">html</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><hr>
+<p>参考文章：</p>
+<p><a href="https://doc.ruoyi.vip/ruoyi-vue/document/hjbs.html#%E9%83%A8%E7%BD%B2%E7%B3%BB%E7%BB%9F">若依官方文档：ruoyi-vue#部署系统</a></p>
+<p><a href="https://doc.ruoyi.vip/ruoyi-app/document/hjbs.html#%E9%83%A8%E7%BD%B2%E7%B3%BB%E7%BB%9F">若依官方文档：ruoyi-app#部署系统</a></p>
+<p><a href="https://hx.dcloud.net.cn/cli/publish-h5">HbuilderX 官方文档：uni-app 发行 h5</a></p>
+
+</main>
+
+  <footer>
+  
+  
+  <hr/>
+  © 2026 8ebb82&rsquo;s Web Note. Powered by <a href="https://gohugo.io">Hugo</a>.
+  
+  </footer>
+  </body>
+</html>

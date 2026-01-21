@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>linux 引导解析 | 8ebb82&#39;s Web Note</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true });
+</script>
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/posts/">文章</a></li>
+      
+      <li><a href="/tags/">标签</a></li>
+      
+      <li><a href="/categories/">分类</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+    <h1>
+        <span class="title">
+            linux 引导解析
+        </span>
+    </h1>
+    
+    <h2 class="date">2026/01/21</h2>
+    <p class="description">常说的 boot 分区，efi 分区，esp 是什么？</p>
+</div>
+
+<main>
+    <h2 id="分区解释">分区解释</h2>
+<ul>
+<li>boot 分区：泛指存放机器启动所需文件的分区，比如内核和 efi 二进制文件等。一般指代 /boot 挂载的分区或者 /boot 文件夹。</li>
+<li>efi 分区：存放 efi 二进制文件的分区。格式为 fat32.</li>
+<li>esp：EFI System Partion. 存储了由 UEFI 固件启动的 UEFI 引导加载器、应用程序和驱动，是 UEFI 启动所必须的 <sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>。</li>
+</ul>
+<p>efi 分区就是 esp, 狭义上的 boot 分区也是 esp.</p>
+<h2 id="引导工具">引导工具</h2>
+<p>主流的有 <a href="https://wiki.archlinuxcn.org/wiki/GRUB">GRUB</a>,<a href="https://wiki.archlinuxcn.org/wiki/Systemd-boot">systemd-boot</a>.</p>
+<h3 id="grub">GRUB</h3>
+<p>对于现代电脑 ( x86 及 x64, 使用 UEFI)，安装命令为：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>grub-install /dev/vda
+</span></span></code></pre></div><p>其中 <code>/dev/vda</code> 为需要安装引导的硬盘，而非分区。</p>
+<p>grub 会在硬盘上寻找 esp, 然后使用默认的安装路径：<code>/boot/efi</code>. 也就是说 grub 默认你把 esp 挂载到<code>/boot/efi</code>. 如果你的路径不符合 grub 规范，需要通过<code>--efi-directory</code>指定 esp 的挂载点（文件夹）. 此外，对于其他架构的电脑，可以通过<code>--target</code>指定架构，比如<code>i686-pc</code>等。</p>
+<p>假设分区挂载方案为：</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: center">分区</th>
+          <th style="text-align: center">挂载点</th>
+          <th style="text-align: center">文件类型</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">/dev/vda1</td>
+          <td style="text-align: center">/boot</td>
+          <td style="text-align: center">ext4</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">/dev/vda2</td>
+          <td style="text-align: center">/boot/efi</td>
+          <td style="text-align: center">fat32</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">/dev/vda3</td>
+          <td style="text-align: center">/</td>
+          <td style="text-align: center">ext4</td>
+      </tr>
+  </tbody>
+</table>
+<p>那么 grub 安装完成后，各个挂载点的文件目录结构如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-plaintext" data-lang="plaintext"><span style="display:flex;"><span>[root@archlinux boot]# pwd
+</span></span><span style="display:flex;"><span>/boot
+</span></span><span style="display:flex;"><span>[root@archlinux boot]# tree . -L 2
+</span></span><span style="display:flex;"><span>.
+</span></span><span style="display:flex;"><span>├── efi
+</span></span><span style="display:flex;"><span>│   └── EFI
+</span></span><span style="display:flex;"><span>├── grub
+</span></span><span style="display:flex;"><span>│   ├── fonts
+</span></span><span style="display:flex;"><span>│   ├── grub.cfg
+</span></span><span style="display:flex;"><span>│   ├── grubenv
+</span></span><span style="display:flex;"><span>│   ├── i386-pc
+</span></span><span style="display:flex;"><span>│   ├── locale
+</span></span><span style="display:flex;"><span>│   ├── themes
+</span></span><span style="display:flex;"><span>│   └── x86_64-efi
+</span></span><span style="display:flex;"><span>├── initramfs-linux.img
+</span></span><span style="display:flex;"><span>├── lost+found
+</span></span><span style="display:flex;"><span>└── vmlinuz-linux
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>10 directories, 4 files
+</span></span></code></pre></div><p><code>/boot</code>挂载点内存放了内核以及 grub 的配置文件 (<code>grub.cfg</code>) 等。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-plaintext" data-lang="plaintext"><span style="display:flex;"><span>[root@archlinux efi]# pwd
+</span></span><span style="display:flex;"><span>/boot/efi
+</span></span><span style="display:flex;"><span>[root@archlinux efi]# tree .
+</span></span><span style="display:flex;"><span>.
+</span></span><span style="display:flex;"><span>└── EFI
+</span></span><span style="display:flex;"><span>    ├── arch
+</span></span><span style="display:flex;"><span>    │   └── grubx64.efi
+</span></span><span style="display:flex;"><span>    └── BOOT
+</span></span><span style="display:flex;"><span>        └── BOOTX64.EFI
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>4 directories, 2 files
+</span></span></code></pre></div><p>grub 在<code>/boot/efi</code>挂载点下创建了 EFI 文件夹来存放 efi 文件，这里主要是<code>grubx64.efi</code>.</p>
+<p>另外一个<code>BOOTX64.EFI</code>是 UEFI 的默认路径。grub 默认不会生成这个文件，install 时需要添加<code>--removable</code>参数。只有当找不到其他 efi 文件时才会使用这个文件。使用 diff 可以发现这两个文件是一样的：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>[root@archlinux EFI]# pwd
+</span></span><span style="display:flex;"><span>/boot/efi/EFI
+</span></span><span style="display:flex;"><span>[root@archlinux EFI]# ls
+</span></span><span style="display:flex;"><span>arch  BOOT
+</span></span><span style="display:flex;"><span>[root@archlinux EFI]# diff arch/grubx64.efi BOOT/BOOTX64.EFI
+</span></span><span style="display:flex;"><span>[root@archlinux EFI]# # no output
+</span></span></code></pre></div><p>以上是标准的分区方式：将内核与 efi 文件分开在不同的分区存放。代价是启动时 grub 需要加载更多的驱动来读取 ext4 分区。</p>
+<p>好处是如果配置了双系统 (linux+windows) 并且共用 esp, 那么 windows 在进行大版本更新时，对 linux 系统来说最坏的情况也只是引导被破坏，这时候只需要重新运行<code>grub-install</code>即可。内核和 grub 配置文件不受影响。</p>
+<p>还有一种&quot;非标准&quot;分区方案：</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: center">分区</th>
+          <th style="text-align: center">挂载点</th>
+          <th style="text-align: center">文件类型</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">/dev/vda1</td>
+          <td style="text-align: center">/boot</td>
+          <td style="text-align: center">fat32</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">/dev/vda2</td>
+          <td style="text-align: center">/</td>
+          <td style="text-align: center">ext4</td>
+      </tr>
+  </tbody>
+</table>
+<p>直接将 esp 挂载到<code>/boot</code>. 这样的话其文件目录结构是：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>[root@archlinux boot]# pwd
+</span></span><span style="display:flex;"><span>/boot
+</span></span><span style="display:flex;"><span>[root@archlinux boot]# ls
+</span></span><span style="display:flex;"><span>EFI  grub  initramfs-linux.img	lost+found  vmlinuz-linux
+</span></span><span style="display:flex;"><span>[root@archlinux boot]# ls EFI/
+</span></span><span style="display:flex;"><span>arch  BOOT
+</span></span></code></pre></div><p>少了一层 efi 文件夹。但代价是双系统时可能会导致内核+引导一起坏掉。</p>
+<h2 id="systemd-boot">systemd-boot</h2>
+<p><code>systemd-boot</code>（以下简称<code>sd-boot</code>) 只能读取<code>fat32</code>类型的分区，必须把内核也放在 esp 里。所以如果使用 sd-boot, 刚刚所说的&quot;非标准&quot;分区方案是可以的。此时文件目录结构为：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>[root@archlinux boot]# pwd
+</span></span><span style="display:flex;"><span>/boot
+</span></span><span style="display:flex;"><span>[root@archlinux boot]# ls
+</span></span><span style="display:flex;"><span>EFI                            initramfs-linux.img   loader                       vmlinuz-linux
+</span></span><span style="display:flex;"><span>initramfs-linux-fallback.img   intel-ucode.img      &#39;System Volume Information&#39;
+</span></span><span style="display:flex;"><span>[root@archlinux boot]# tree EFI/ -L 2
+</span></span><span style="display:flex;"><span>EFI/
+</span></span><span style="display:flex;"><span>├── BOOT
+</span></span><span style="display:flex;"><span>│   └── BOOTX64.EFI
+</span></span><span style="display:flex;"><span>├── Linux
+</span></span><span style="display:flex;"><span>├── Microsoft
+</span></span><span style="display:flex;"><span>│   ├── Boot
+</span></span><span style="display:flex;"><span>│   └── Recovery
+</span></span><span style="display:flex;"><span>└── systemd
+</span></span><span style="display:flex;"><span>    └── systemd-bootx64.efi
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>7 directories, 2 files
+</span></span></code></pre></div><p>可以看到 efi 文件在<code>/boot/EFI</code>下，而不是标准分区的<code>/boot/efi/EFI</code>. 并且 sd-boot 默认会生成<code>BOOTX64.EFI</code>. 这里有微软相关的文件是因为配置了双系统，并且共用 esp.</p>
+<p>sd-boot 更简单易用，安装命令为：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>bootctl install
+</span></span></code></pre></div><p>但代价是不够灵活：必须把内核也放在 esp 内。</p>
+<h2 id="qa">Q&amp;A</h2>
+<p>Q: 如果 <code>/boot</code> 本身就是 esp 的挂载点，那么在不指定<code>--efi-direcroty</code>的情况下，grub 还会去<code>/boot/efi</code>下进行安装吗？</p>
+<p>A: 是的。grub 只会寻找 esp 然后使用默认路径。这种分区方式就是上述的&quot;非标准&quot;分区。此时如果<code>/boot/efi</code>这个文件夹存在，那么 grub 会进行安装，并且告诉你安装成功。但实际上是无法自动引导机器启动的。因为大多数主板只会在 <strong>esp 分区的根路径</strong>下寻找<code>EFI</code>文件夹（即<code>/EFI</code>), 而非<code>/efi/EFI</code>. 这种时候可以手动指定启动文件或者添加启动项。</p>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>请见 <a href="https://wiki.archlinuxcn.org/wiki/EFI_%E7%B3%BB%E7%BB%9F%E5%88%86%E5%8C%BA">Arch Linux 中文维基：EFI 分区</a>.&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+
+</main>
+
+  <footer>
+  
+  
+  <hr/>
+  © 2026 8ebb82&rsquo;s Web Note. Powered by <a href="https://gohugo.io">Hugo</a>.
+  
+  </footer>
+  </body>
+</html>

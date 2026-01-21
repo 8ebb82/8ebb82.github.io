@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>nginx on windows 全局使用 | 8ebb82&#39;s Web Note</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true });
+</script>
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/posts/">文章</a></li>
+      
+      <li><a href="/tags/">标签</a></li>
+      
+      <li><a href="/categories/">分类</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+    <h1>
+        <span class="title">
+            nginx on windows 全局使用
+        </span>
+    </h1>
+    
+    <h2 class="date">2025/05/09</h2>
+    <p class="description">像在 linux 上一样使用 nginx</p>
+</div>
+
+<main>
+    <p>首先需要添加 nginx.exe 到环境变量中，这点不再赘述。到这里已经可以全局使用 <code>nginx</code> 命令。</p>
+<p>但是在执行<strong>与配置文件有关的命令</strong>时，nginx 会提示找不到文件。因为 nginx <strong>默认在当前目录下寻找相关文件</strong>。这里使用 bat 文件实现命令包装。</p>
+<p>编写文件 <code>ngx.bat</code>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bat" data-lang="bat"><span style="display:flex;"><span>@<span style="color:#66d9ef">echo</span> off
+</span></span><span style="display:flex;"><span>:<span style="color:#75715e">:如果直接把 nginx.exe 路径添加到 PATH 中，那么需要写下面这行</span>
+</span></span><span style="display:flex;"><span>:<span style="color:#75715e">:set NGINX_HOME=你的 nginx.exe 路径</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;</span>%1<span style="color:#e6db74">&#34;</span><span style="color:#f92672">==</span><span style="color:#e6db74">&#34;-?&#34;</span> <span style="color:#66d9ef">goto</span> help
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;</span>%1<span style="color:#e6db74">&#34;</span><span style="color:#f92672">==</span><span style="color:#e6db74">&#34;-h&#34;</span> <span style="color:#66d9ef">goto</span> help
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;</span>%1<span style="color:#e6db74">&#34;</span><span style="color:#f92672">==</span><span style="color:#e6db74">&#34;-v&#34;</span> <span style="color:#66d9ef">goto</span> vVtTqspecg
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;</span>%1<span style="color:#e6db74">&#34;</span><span style="color:#f92672">==</span><span style="color:#e6db74">&#34;-V&#34;</span> <span style="color:#66d9ef">goto</span> vVtTqspecg
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;</span>%1<span style="color:#e6db74">&#34;</span><span style="color:#f92672">==</span><span style="color:#e6db74">&#34;-t&#34;</span> <span style="color:#66d9ef">goto</span> vVtTqspecg
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;</span>%1<span style="color:#e6db74">&#34;</span><span style="color:#f92672">==</span><span style="color:#e6db74">&#34;-T&#34;</span> <span style="color:#66d9ef">goto</span> vVtTqspecg
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;</span>%1<span style="color:#e6db74">&#34;</span><span style="color:#f92672">==</span><span style="color:#e6db74">&#34;-q&#34;</span> <span style="color:#66d9ef">goto</span> vVtTqspecg
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;</span>%1<span style="color:#e6db74">&#34;</span><span style="color:#f92672">==</span><span style="color:#e6db74">&#34;-s&#34;</span> <span style="color:#66d9ef">goto</span> vVtTqspecg
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;</span>%1<span style="color:#e6db74">&#34;</span><span style="color:#f92672">==</span><span style="color:#e6db74">&#34;-p&#34;</span> <span style="color:#66d9ef">goto</span> vVtTqspecg
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;</span>%1<span style="color:#e6db74">&#34;</span><span style="color:#f92672">==</span><span style="color:#e6db74">&#34;-e&#34;</span> <span style="color:#66d9ef">goto</span> vVtTqspecg
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;</span>%1<span style="color:#e6db74">&#34;</span><span style="color:#f92672">==</span><span style="color:#e6db74">&#34;-c&#34;</span> <span style="color:#66d9ef">goto</span> vVtTqspecg
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;</span>%1<span style="color:#e6db74">&#34;</span><span style="color:#f92672">==</span><span style="color:#e6db74">&#34;-g&#34;</span> <span style="color:#66d9ef">goto</span> vVtTqspecg
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;</span>%1<span style="color:#e6db74">&#34;</span><span style="color:#f92672">==</span><span style="color:#e6db74">&#34;start&#34;</span> <span style="color:#66d9ef">goto</span> start
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;</span>%1<span style="color:#e6db74">&#34;</span><span style="color:#f92672">==</span><span style="color:#e6db74">&#34;search&#34;</span> <span style="color:#66d9ef">goto</span> search
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;</span>%1<span style="color:#e6db74">&#34;</span><span style="color:#f92672">==</span><span style="color:#e6db74">&#34;kill&#34;</span> <span style="color:#66d9ef">goto</span> kill
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">goto</span> errors
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>:help
+</span></span><span style="display:flex;"><span>nginx -v
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span> Usage: nginx2 [-?,-h] [-v] [-V] [-t] [-T] [-q]
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span>               [-s signal] [-p prefix] [-e filename] [-c filename] [-g directives]
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span>               [start] [search] [kill]
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span>=
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span> Options:
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span>   -?,-h           : this help
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span>   -v              : show version and exit
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span>   -V              : show version and configure options then exit
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span>   -t              : test configuration and exit
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span>   -T              : test configuration, dump it and exit
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span>   -q              : suppress non-error messages during configuration testing
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span>   -s signal       : send signal to a master process: stop, quit, reopen, reload
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span>   -p prefix       : set prefix path (default: NONE)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span>   -e filename     : set error log file (default: logs/error.log)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span>   -c filename     : set configuration file (default: conf/nginx.conf)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span>   -g directives   : set global directives out of configuration file
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span>   start           : start nginx master process(customize include)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span>   search          : show the nginx master process list(customize include)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span>   kill            : kill all nginx master processes(customize include)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span>=
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">exit</span> /B
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>:vVtTqspecg
+</span></span><span style="display:flex;"><span>nginx %1 %2 -p <span style="color:#e6db74">&#34;</span>%NGINX_HOME%<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">exit</span> /B
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>:start
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">start</span> nginx -p  <span style="color:#e6db74">&#34;</span>%NGINX_HOME%<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">exit</span> /B
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>:search
+</span></span><span style="display:flex;"><span>tasklist /fi <span style="color:#e6db74">&#34;imagename eq nginx.exe&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">exit</span> /B
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>:kill
+</span></span><span style="display:flex;"><span>taskkill /F /IM nginx.exe
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">exit</span> /B
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>:errors
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span> nginx2: invalid option: <span style="color:#e6db74">&#34;</span>%1<span style="color:#e6db74"> </span>%2<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span>=
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">exit</span> /B
+</span></span></code></pre></div><p>然后将其放入任意一个已经在环境变量中的目录中。我选择放入与 nginx.exe 相同的目录。</p>
+<p>这样，在使用 nginx 时，使用 <code>ngx</code> 代替（bat 文件名）。</p>
+<hr>
+<p>参考文章</p>
+<p><a href="https://jnssd.com/2023/01/17/operation/Windows%E4%B8%8B%E9%85%8D%E7%BD%AENginx%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%EF%BC%8C%E6%97%A0%E9%9C%80%E5%9C%A8Nginx%E6%96%87%E4%BB%B6%E4%B8%8B%E5%90%AF%E5%8A%A8/">江南山水电的博客</a>（免费复制）</p>
+<p><a href="https://www.cnblogs.com/Marydon20170307/p/15944960.html">博客园：Marydon 的博客</a>（付费复制闹麻了）</p>
+
+</main>
+
+  <footer>
+  
+  
+  <hr/>
+  © 2026 8ebb82&rsquo;s Web Note. Powered by <a href="https://gohugo.io">Hugo</a>.
+  
+  </footer>
+  </body>
+</html>

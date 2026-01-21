@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>nginx 路径拼接问题 | 8ebb82&#39;s Web Note</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true });
+</script>
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/posts/">文章</a></li>
+      
+      <li><a href="/tags/">标签</a></li>
+      
+      <li><a href="/categories/">分类</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+    <h1>
+        <span class="title">
+            nginx 路径拼接问题
+        </span>
+    </h1>
+    
+    <h2 class="date">2025/04/19</h2>
+    <p class="description">文件路径拼接错误</p>
+</div>
+
+<main>
+    <h2 id="问题">问题</h2>
+<p>在访问指定路径时返回的是 nginx 默认的页面，而不是部署的前端项目。</p>
+<h2 id="站点配置">站点配置</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nginx" data-lang="nginx"><span style="display:flex;"><span><span style="color:#66d9ef">server</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">listen</span>       <span style="color:#ae81ff">13700</span>; <span style="color:#75715e"># 服务端口
+</span></span></span><span style="display:flex;"><span>  <span style="color:#f92672">server_name</span> <span style="color:#e6db74">_</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">charset</span>      <span style="color:#e6db74">utf-8</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># 前端页面入口
+</span></span></span><span style="display:flex;"><span>  <span style="color:#f92672">location</span> <span style="color:#e6db74">/web/</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">root</span>   <span style="color:#e6db74">/opt/ruoyi-dist/web</span>; <span style="color:#75715e"># web端根目录
+</span></span></span><span style="display:flex;"><span>    <span style="color:#f92672">index</span>  <span style="color:#e6db74">index.html</span> <span style="color:#e6db74">index.htm</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">try_files</span> $uri $uri/ <span style="color:#e6db74">/index.html</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">location</span> <span style="color:#e6db74">/app/</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">root</span>   <span style="color:#e6db74">/opt/ruoyi-dist/app/web</span>; <span style="color:#75715e"># app端根目录
+</span></span></span><span style="display:flex;"><span>    <span style="color:#f92672">index</span>  <span style="color:#e6db74">index.html</span> <span style="color:#e6db74">index.htm</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">try_files</span> $uri $uri/ <span style="color:#e6db74">/index.html</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="原因">原因</h2>
+<p>在浏览器中访问 <code>ip:13700/web/</code> 时，nginx 会把路径拼接成：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>/opt/ruoyi-dist/web + /web/index.html
+</span></span><span style="display:flex;"><span>=
+</span></span><span style="display:flex;"><span>/opt/ruoyi-dist/web/web/index.html # 错误路径，多了一级 web
+</span></span></code></pre></div><p>但实际上我希望的是直接把 <code>/web/</code> 替换为站点资源路径：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>/web/
+</span></span><span style="display:flex;"><span>=
+</span></span><span style="display:flex;"><span>/opt/ruoyi-dist/web/index.html # 正确路径
+</span></span></code></pre></div><h2 id="解决">解决</h2>
+<p>使用 <code>alias</code> 实现路径的直接替换。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span><span style="color:#f92672">- root   /opt/ruoyi-dist/web; # web端根目录
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+ alias /opt/ruoyi-dist/web/;
+</span></span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span><span style="color:#f92672">- root   /opt/ruoyi-dist/app/web; # app端根目录
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+ alias /opt/ruoyi-dist/app/web/;
+</span></span></span></code></pre></div>
+</main>
+
+  <footer>
+  
+  
+  <hr/>
+  © 2026 8ebb82&rsquo;s Web Note. Powered by <a href="https://gohugo.io">Hugo</a>.
+  
+  </footer>
+  </body>
+</html>

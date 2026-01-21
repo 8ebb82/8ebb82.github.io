@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>从 gitlabce 迁移到 gitea | 8ebb82&#39;s Web Note</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true });
+</script>
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/posts/">文章</a></li>
+      
+      <li><a href="/tags/">标签</a></li>
+      
+      <li><a href="/categories/">分类</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+    <h1>
+        <span class="title">
+            从 gitlabce 迁移到 gitea
+        </span>
+    </h1>
+    
+    <h2 class="date">2025/05/21</h2>
+    <p class="description">开发规模太小导致浪费资源</p>
+</div>
+
+<main>
+    <h2 id="背景">背景</h2>
+<p>项目组目前的开发团队只有 10 人不到，使用 gitlabce 进行代码托管。但是只需要代码托管的功能，用不上什么 CI/CD 之类的东西。</p>
+<p>这就导致服务器每天都是内存几乎爆满的，影响其他服务的性能，比如 mysql 等。于是打算迁移到 <a href="https://about.gitea.com/">gitea</a>。</p>
+<h2 id="备份">备份</h2>
+<p>首先需要备份仓库。由于原有的仓库数量不多，所以手动进行备份：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git clone --mirror &lt;link.git&gt;
+</span></span></code></pre></div><p>使用 <code>--mirror</code> 模式进行 clone，会得到一个裸仓库（文件夹有个 <code>.git</code> 后缀），没有工作区，不能直接编辑。</p>
+<p>接着是完全停止原有的 gitlabce 服务：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 停止 GitLab 服务</span>
+</span></span><span style="display:flex;"><span>sudo gitlab-ctl stop
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 禁用 GitLab 开机自启动</span>
+</span></span><span style="display:flex;"><span>sudo systemctl disable gitlab-runsvdir
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 验证是否已禁用</span>
+</span></span><span style="display:flex;"><span>sudo systemctl is-enabled gitlab-runsvdir
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 应该显示 &#34;disabled&#34;</span>
+</span></span></code></pre></div><p>接下来就是部署 gitea。我选择手动部署到主机上，数据库服务使用本机上的 mysql .过程参考 <a href="https://docs.gitea.com/zh-cn/category/installation">官方教程</a>。</p>
+<h2 id="注意事项--踩坑">注意事项 &amp; 踩坑</h2>
+<p>我使用 <code>systemctl</code> 进行 gitea 服务的管理。由于使用本机上的 mysql 服务，根据官方说明：</p>
+<blockquote>
+<p>接着拷贝示例代码 gitea.service 并取消对任何需要运行在主机上的服务部分的注释，譬如 MySQL。</p>
+</blockquote>
+<p>取消注释 <a href="https://github.com/go-gitea/gitea/blob/release/v1.23/contrib/systemd/gitea.service">服务注册示例文件</a> 中的 mysql 相关的配置项：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#f92672">- #Wants=mysql.service
+</span></span></span><span style="display:flex;"><span><span style="color:#f92672">- #After=mysql.service
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+ Wants=mysql.service
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+ After=mysql.service
+</span></span></span></code></pre></div><p>根据官方教程，复制完可执行文件 <code>gitea</code> 后，不要忘记给予这个文件执行权限：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>chmod +x /usr/local/bin/gitea
+</span></span></code></pre></div><p>一开始我没给这个权限，导致配置文件 <code>app.ini</code> 没有自动生成，还以为要自己准备配置文件（我使用 web 界面安装，它会自动生成配置文件）。</p>
+<p>再次启动服务报错没有这个路径：<code>/var/lib/gitea/git</code>。所以手动创建，并且给予 <code>git</code> 用户权限：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo mkdir /var/lib/gitea/git
+</span></span><span style="display:flex;"><span>sudo chown git:git /var/lib/gitea/git
+</span></span><span style="display:flex;"><span>sudo chmod <span style="color:#ae81ff">755</span> /var/lib/gitea/git
+</span></span></code></pre></div><p>再次启动服务，报错无权限写入 <code>/home/git/</code>，所以：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo chown -R git:git /home/git/.ssh
+</span></span><span style="display:flex;"><span>sudo chmod -R <span style="color:#ae81ff">700</span> /home/git/.ssh
+</span></span></code></pre></div><p>由于已有域名和证书，配置 https 需要按照 <a href="https://docs.gitea.com/zh-cn/administration/https-setup#%E4%BD%BF%E7%94%A8%E5%86%85%E7%BD%AE%E6%9C%8D%E5%8A%A1%E5%99%A8">官方教程配置 https：使用内置服务器</a>。<del>问 ai 的是不准的</del>。顺手也把 nginx 配置了（当时没发现这个教程是使用 gitea 内置服务器）</p>
+<p>配置完毕之后访问仓库报错 nginx 502。查看 gitea 服务状态发现其已经正常运行，并且监听的是 <code>https://0.0.0.0:3000</code>，所以猜测是 nginx 配置里没写对地址。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span>server {
+</span></span><span style="display:flex;"><span>    listen 443 ssl;
+</span></span><span style="display:flex;"><span>    server_name your_domain;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    ssl_certificate /ssl/your_domain.pem;
+</span></span><span style="display:flex;"><span>    ssl_certificate_key /ssl/your_domain.key;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    location / {
+</span></span><span style="display:flex;"><span>        client_max_body_size 10G; # 迁移仓库需要
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-       proxy_pass http://localhost:3000;
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+       proxy_pass https://0.0.0.0:3000;
+</span></span></span><span style="display:flex;"><span>        proxy_set_header Connection $http_connection;
+</span></span><span style="display:flex;"><span>        proxy_set_header Upgrade $http_upgrade;
+</span></span><span style="display:flex;"><span>        proxy_set_header Host $host;
+</span></span><span style="display:flex;"><span>        proxy_set_header X-Real-IP $remote_addr;
+</span></span><span style="display:flex;"><span>        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+</span></span><span style="display:flex;"><span>        proxy_set_header X-Forwarded-Proto $scheme;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>改正之后可以正常访问了。location 块中的内容来自 <a href="https://docs.gitea.com/zh-cn/administration/reverse-proxies#%E4%BD%BF%E7%94%A8-nginx-%E4%BD%9C%E4%B8%BA%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%E6%9C%8D%E5%8A%A1">gitea 官方示例模板</a>。</p>
+<p>所以实际上是本机上的 nginx 生效了而不是 gitea 内置的服务器生效了？</p>
+<h2 id="special-thanks">Special Thanks</h2>
+<p><a href="https://about.gitea.com/">Gitea:Git with a cup of tea</a></p>
+<p><a href="https://chat.deepseek.com/">DeepSeek:Deepseek</a></p>
+<p><a href="https://www.doubao.com/chat/">ByteDance:Doubao</a></p>
+<p><a href="https://gemini.google.com/app/">Google:Gemini</a></p>
+<p><a href="https://chatgpt.com/">OpenAI:ChatGPT</a></p>
+
+</main>
+
+  <footer>
+  
+  
+  <hr/>
+  © 2026 8ebb82&rsquo;s Web Note. Powered by <a href="https://gohugo.io">Hugo</a>.
+  
+  </footer>
+  </body>
+</html>

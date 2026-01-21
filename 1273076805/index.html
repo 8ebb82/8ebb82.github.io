@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Acvitity 初识 | xici&#39;s Web Note</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true });
+</script>
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/posts/">文章</a></li>
+      
+      <li><a href="/tags/">标签</a></li>
+      
+      <li><a href="/categories/">分类</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+    <h1>
+        <span class="title">
+            Acvitity 初识
+        </span>
+    </h1>
+    
+    <h2 class="date">2025/03/15</h2>
+    
+</div>
+
+<main>
+    <h1 id="要素">要素</h1>
+<p>创建一个 Activity 需要以下要素：</p>
+<p>Activity 类：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ActivityName</span> : ComponentActivity() {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">override</span> <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">onCreate</span>(savedInstanceState: Bundle?) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">super</span>.onCreate(savedInstanceState)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// code..
+</span></span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>布局文件： <code>src/main/res/layout/activity_name.xml</code></p>
+<p>在 AndroidManifest.xml 文件中注册：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;activity</span> <span style="color:#a6e22e">android:name=</span><span style="color:#e6db74">&#34;.ActivityName&#34;</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">android:label=</span><span style="color:#e6db74">&#34;This is ActivityName&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">&lt;!--如果需要作为主界面，还需要以下两个属性--&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;intent-filter&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;action</span> <span style="color:#a6e22e">android:name=</span><span style="color:#e6db74">&#34;android.intent.action.MAIN&#34;</span> <span style="color:#f92672">/&gt;</span> 
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;category</span> <span style="color:#a6e22e">android:name=</span><span style="color:#e6db74">&#34;android.intent.category.LAUNCHER&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/intent-filter&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/activity&gt;</span>
+</span></span></code></pre></div><h1 id="获取控件">获取控件</h1>
+<p>一般使用 <code>findViewById</code> 方法获取控件：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">val</span> textView = findViewById&lt;TextView&gt;(<span style="color:#a6e22e">R</span>.id.textView)
+</span></span></code></pre></div><p>使用 kotlin 的安卓项目中，可以在模块级 <code>build.gradle</code> 文件中启用 <code>viewBindding</code>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gradle" data-lang="gradle"><span style="display:flex;"><span>android <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>    viewBinding <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><p>这样就可以直接使用控件 id 获取控件：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">val</span> binding = <span style="color:#a6e22e">ActivityMainBinding</span>.inflate(layoutInflater)
+</span></span><span style="display:flex;"><span>setContentView(binding.root)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">val</span> button1 = binding.button1
+</span></span></code></pre></div><p>同时 Android Studio 会自动生成一个 <code>import com.example.app.databinding.ActivityMainBinding</code> 语句。</p>
+<h1 id="生命周期">生命周期</h1>
+<p>安卓系统使用 task 来管理 Activity ，一个 task 就是存放在返回栈中的 Activity 集合。</p>
+<p>每个 Activity 都有一个生命周期，包括以下几个状态：</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: center">状态</th>
+          <th style="text-align: center">描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">运行状态</td>
+          <td style="text-align: center">完全可见，位于栈顶</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">暂停状态</td>
+          <td style="text-align: center">可见，不位于栈顶</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">停止状态</td>
+          <td style="text-align: center">完全不可见，不位于栈顶</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">销毁状态</td>
+          <td style="text-align: center">从栈中移除</td>
+      </tr>
+  </tbody>
+</table>
+<p>对应的回调方法：</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: center">方法</th>
+          <th style="text-align: center">描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center"><code>onCreate</code></td>
+          <td style="text-align: center">创建时调用</td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>onStart</code></td>
+          <td style="text-align: center">启动时调用</td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>onResume</code></td>
+          <td style="text-align: center">恢复时调用</td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>onPause</code></td>
+          <td style="text-align: center">暂停时调用</td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>onStop</code></td>
+          <td style="text-align: center">停止（完全不可见）时调用</td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>onReStart</code></td>
+          <td style="text-align: center">重启时调用</td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>onDestroy</code></td>
+          <td style="text-align: center">销毁时调用</td>
+      </tr>
+  </tbody>
+</table>
+<div class="mermaid">
+    
+graph TD
+    A((启动Activity)) --> B[onCreate]
+    B --> C[onStart]
+    C --> D[onResume]
+    D --> E((Activity运行中))
+
+    E --> |其他Activity来到前台| F[onPause] 
+
+    F --> |Activity不再可见| G[onStop]
+    G --> |Activity被销毁| H[onDestroy]
+    H --> I((关闭Activity))
+
+    F --> |返回上一个Activity| D
+    
+    G --> |返回上一个Activity| K[onReStart]
+    K --> C
+
+    G & F --> |其他优先级高的程序需要内存| J((杀掉进程))
+    J --> |返回上一个Activity| B
+
+
+</div>
+<h2 id="临时保存数据">临时保存数据</h2>
+<p>在 Activity 生命周期中，有时需要保存数据，可以使用 <code>onSaveInstanceState</code> 方法：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">override</span> <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">onSaveInstanceState</span>(outState: Bundle) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">super</span>.onSaveInstanceState(outState)
+</span></span><span style="display:flex;"><span>    outState.putString(<span style="color:#e6db74">&#34;key&#34;</span>, <span style="color:#e6db74">&#34;value&#34;</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>在 <code>onCreate</code> 方法中获取：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">override</span> <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">onCreate</span>(savedInstanceState: Bundle?) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">super</span>.onCreate(savedInstanceState)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (savedInstanceState <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">val</span> value = savedInstanceState.getString(<span style="color:#e6db74">&#34;key&#34;</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h1 id="启动模式">启动模式</h1>
+<p>Activity 的启动模式有以下几种：</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: center">模式</th>
+          <th style="text-align: center">描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center"><code>standard</code>（默认）</td>
+          <td style="text-align: center">每次启动都会创建一个新的 Activity 实例，不管栈中是否已经存在</td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>singleTop</code></td>
+          <td style="text-align: center">如果栈顶是该 Activity 实例，则直接使用；否则创建新实例</td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>singleTask</code></td>
+          <td style="text-align: center">如果栈中已经存在该 Activity 实例，则将其上方的 Activity 实例全部出栈；否则创建新实例</td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>singleInstance</code></td>
+          <td style="text-align: center">该 Activity 实例独立于其他 Activity 实例，单独存在一个任务栈中</td>
+      </tr>
+  </tbody>
+</table>
+<p>singleInstance 模式图解：</p>
+<div class="mermaid">
+    
+graph LR
+    subgraph 返回栈A
+        A1[Activity1]
+        A2[Activity2]
+
+        A1 --> |返回| A2
+    end
+
+    subgraph 返回栈B
+        A3[Activity3]
+    end
+
+        A2 --> |返回| A3
+        A2 --> |启动新Activity| A3
+
+        A3 --> |启动新Activity| A1
+
+
+</div>
+<p>Activity 的启动模式可以在 AndroidManifest.xml 文件中设置：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;activity</span> <span style="color:#a6e22e">android:name=</span><span style="color:#e6db74">&#34;.ActivityName&#34;</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">android:launchMode=</span><span style="color:#e6db74">&#34;singleTop&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/activity&gt;</span>
+</span></span></code></pre></div><h1 id="一些实践">一些实践</h1>
+<h2 id="查看当前所在-activity">查看当前所在 Activity</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#a6e22e">Log</span>.d(TAG, <span style="color:#66d9ef">this</span>.toString())
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Log</span>.d(TAG, <span style="color:#66d9ef">this</span>.javaClass.simpleName)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Log</span>.d(TAG, javaClass.simpleName)
+</span></span></code></pre></div><p>this 是当前 Activity 的实例引用，this.javaClass.simpleName 和 javaClass.simpleName 都是当前 Activity 的类名。</p>
+<p>输出：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-plaintext" data-lang="plaintext"><span style="display:flex;"><span>com.example.activitytest.FirstActivity@86bde1c
+</span></span><span style="display:flex;"><span>FirstActivity
+</span></span><span style="display:flex;"><span>FirstActivity
+</span></span></code></pre></div><p><code>@86bde1c</code>是当前 Activity 的哈希码，默认是内存地址的十六进制表示。</p>
+<h2 id="一次性结束所有-activity">一次性结束所有 Activity</h2>
+<p>维护一个单例类 ActivityCollector 作为当前所有 Activity 的集合：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">object</span> <span style="color:#a6e22e">ActivityCollector</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">val</span> activities = ArrayList&lt;Activity&gt;()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">addActivity</span>(activity: Activity) {
+</span></span><span style="display:flex;"><span>        activities.add(activity) <span style="color:#75715e">// 添加 Activity
+</span></span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">removeActivity</span>(activity: Activity) {
+</span></span><span style="display:flex;"><span>        activities.remove(activity) <span style="color:#75715e">// 移除 Activity
+</span></span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">finishAll</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (activity <span style="color:#66d9ef">in</span> activities) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (!activity.isFinishing) { <span style="color:#75715e">// 判断 Activity 是否正在销毁
+</span></span></span><span style="display:flex;"><span>                activity.finish() <span style="color:#75715e">// 销毁 Activity
+</span></span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>之后，在具体的 Activity 中重写 <code>onDestroy</code> 方法：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">override</span> <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">onDestroy</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">super</span>.onDestroy()
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ActivityCollector</span>.removeActivity(<span style="color:#66d9ef">this</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>这样，在任意处，只要调用 <code>ActivityCollector.finishAll()</code> 方法，就可以一次性结束所有 Activity，达到一次性退出程序的目的。</p>
+<h2 id="基本类">基本类</h2>
+<p>创建一个基本类 BaseActivity，继承自 AppCompatActivity：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">open</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">BaseActivity</span> : AppCompatActivity() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">onCreate</span>(savedInstanceState: Bundle?) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">super</span>.onCreate(savedInstanceState)
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Log</span>.d(TAG, javaClass.simpleName)
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ActivityCollector</span>.addActivity(<span style="color:#66d9ef">this</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">onDestroy</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">super</span>.onDestroy()
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ActivityCollector</span>.removeActivity(<span style="color:#66d9ef">this</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>之后，所有 Activity 都继承自 BaseActivity，这样就不必重写许多基本的方法。</p>
+<h2 id="启动-activity-的最佳写法">启动 Activity 的最佳写法</h2>
+<p>如果一个 Activity 启动时需要传递数据，最佳写法是定义一个静态方法 <code>actionStart</code> ：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">YourActivity</span> : BaseActivity() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">companion</span> <span style="color:#66d9ef">object</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">actionStart</span>(context: Context, data1: String, data2: String) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">val</span> intent = Intent(context, YourActivity<span style="color:#f92672">::</span><span style="color:#66d9ef">class</span>.java)
+</span></span><span style="display:flex;"><span>            intent.putExtra(<span style="color:#e6db74">&#34;param1&#34;</span>, data1)
+</span></span><span style="display:flex;"><span>            intent.putExtra(<span style="color:#e6db74">&#34;param2&#34;</span>, data2)
+</span></span><span style="display:flex;"><span>            context.startActivity(intent)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>kotlin规定，所有定义在 <code>companion object</code> 中的方法都可以使用类似于 java 静态方法的形式调用。</p>
+<p>这样在其他地方启动 Activity 时，只需要调用 <code>YourActivity.actionStart(context, data1, data2)</code> 方法即可。</p>
+
+</main>
+
+  <footer>
+  
+  
+  <hr/>
+  © 2026 xici&rsquo;s Web Note. Powered by <a href="https://gohugo.io">Hugo</a>.
+  
+  </footer>
+  </body>
+</html>

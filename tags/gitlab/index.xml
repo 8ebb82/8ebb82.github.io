@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Gitlab on 8ebb82&#39;s Web Note</title>
+    <link>http://8ebb82.github.io/tags/gitlab/</link>
+    <description>Recent content in Gitlab on 8ebb82&#39;s Web Note</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 21 May 2025 21:48:34 +0800</lastBuildDate>
+    <atom:link href="http://8ebb82.github.io/tags/gitlab/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>从 gitlabce 迁移到 gitea</title>
+      <link>http://8ebb82.github.io/1266417345/</link>
+      <pubDate>Wed, 21 May 2025 21:48:34 +0800</pubDate>
+      <guid>http://8ebb82.github.io/1266417345/</guid>
+      <description>&lt;h2 id=&#34;背景&#34;&gt;背景&lt;/h2&gt;&#xA;&lt;p&gt;项目组目前的开发团队只有 10 人不到，使用 gitlabce 进行代码托管。但是只需要代码托管的功能，用不上什么 CI/CD 之类的东西。&lt;/p&gt;&#xA;&lt;p&gt;这就导致服务器每天都是内存几乎爆满的，影响其他服务的性能，比如 mysql 等。于是打算迁移到 &lt;a href=&#34;https://about.gitea.com/&#34;&gt;gitea&lt;/a&gt;。&lt;/p&gt;&#xA;&lt;h2 id=&#34;备份&#34;&gt;备份&lt;/h2&gt;&#xA;&lt;p&gt;首先需要备份仓库。由于原有的仓库数量不多，所以手动进行备份：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clone --mirror &amp;lt;link.git&amp;gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;使用 &lt;code&gt;--mirror&lt;/code&gt; 模式进行 clone，会得到一个裸仓库（文件夹有个 &lt;code&gt;.git&lt;/code&gt; 后缀），没有工作区，不能直接编辑。&lt;/p&gt;&#xA;&lt;p&gt;接着是完全停止原有的 gitlabce 服务：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 停止 GitLab 服务&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo gitlab-ctl stop&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 禁用 GitLab 开机自启动&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo systemctl disable gitlab-runsvdir&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 验证是否已禁用&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo systemctl is-enabled gitlab-runsvdir&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 应该显示 &amp;#34;disabled&amp;#34;&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;接下来就是部署 gitea。我选择手动部署到主机上，数据库服务使用本机上的 mysql .过程参考 &lt;a href=&#34;https://docs.gitea.com/zh-cn/category/installation&#34;&gt;官方教程&lt;/a&gt;。&lt;/p&gt;&#xA;&lt;h2 id=&#34;注意事项--踩坑&#34;&gt;注意事项 &amp;amp; 踩坑&lt;/h2&gt;&#xA;&lt;p&gt;我使用 &lt;code&gt;systemctl&lt;/code&gt; 进行 gitea 服务的管理。由于使用本机上的 mysql 服务，根据官方说明：&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;接着拷贝示例代码 gitea.service 并取消对任何需要运行在主机上的服务部分的注释，譬如 MySQL。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

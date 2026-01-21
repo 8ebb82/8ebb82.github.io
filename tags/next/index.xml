@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Next on xici&#39;s blog</title>
+    <link>http://localhost:1313/tags/next/</link>
+    <description>Recent content in Next on xici&#39;s blog</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 07 Apr 2025 20:06:52 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/next/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>使用 github 作为图床</title>
+      <link>http://localhost:1313/361247849/</link>
+      <pubDate>Mon, 07 Apr 2025 20:06:52 +0000</pubDate>
+      <guid>http://localhost:1313/361247849/</guid>
+      <description>&lt;ol&gt;&#xA;&lt;li&gt;新建仓库，设置为 public 。&lt;/li&gt;&#xA;&lt;li&gt;获取 token 。&lt;/li&gt;&#xA;&lt;li&gt;配置 picgo ，设置 github 为默认图床。&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;参考文章：&lt;/p&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://www.haoyep.com/posts/github-graph-beds/&#34;&gt;haoyep：使用PicGo + GitHub 搭建 Obsidian 图床&lt;/a&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://github.com/Molunerfinn/PicGo/issues/825&#34;&gt;GitHub issues&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

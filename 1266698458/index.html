@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>springboot 初识 | xici&#39;s Web Note</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true });
+</script>
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/posts/">文章</a></li>
+      
+      <li><a href="/tags/">标签</a></li>
+      
+      <li><a href="/categories/">分类</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+    <h1>
+        <span class="title">
+            springboot 初识
+        </span>
+    </h1>
+    
+    <h2 class="date">2025/03/31</h2>
+    
+</div>
+
+<main>
+    <h1 id="springboot-是什么">springboot 是什么</h1>
+<p>springboot 是 spring 框架的一个子部件，用于快速构建 spring web 项目。</p>
+<h2 id="快速构建">快速构建</h2>
+<ol>
+<li>创建 maven 工程</li>
+<li>导入起步依赖：spring-boot-starter-web</li>
+<li>提供启动类</li>
+<li>编写 Controller</li>
+</ol>
+<p>如果使用 IDEA 进行构建，只需要手动进行第四步，其他的会自动完成。</p>
+<p>启动类：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// springboot工程启动类</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@SpringBootApplication</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SpringbootQuickstartApplication</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) {
+</span></span><span style="display:flex;"><span>        SpringApplication.<span style="color:#a6e22e">run</span>(SpringbootQuickstartApplication.<span style="color:#a6e22e">class</span>, args);
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 两个参数：当前类的class文件、启动参数</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>编写 Controller ：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@RestController</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">HelloController</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@RequestMapping</span>(<span style="color:#e6db74">&#34;/hello&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">hello</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;hello!&#34;</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>运行项目后，访问 localhost:8080/hello ，可以看到 <code>hello!</code> 这个字符串。</p>
+<p>{% note info %}
+手动创建工程只需要创建文件即可，比如：</p>
+<ol>
+<li><code>pom.xml</code> 文件，并手动导入依赖；</li>
+<li>启动类</li>
+<li>Controller
+有了这三个文件就可以启动了，这是一个最小的 springboot 项目。
+{% endnote %}</li>
+</ol>
+<hr>
+<h1 id="applicationproperties-配置文件">application.properties 配置文件</h1>
+<p><code>/resources</code> 目录下的 <code>application.properties</code> 或者 <code>application.yml</code> 是项目的配置文件。它们的作用是相同的，只是语法格式不同。<code>springboot</code> 会自动识别并读取其中的配置。</p>
+<h2 id="编写配置信息">编写配置信息</h2>
+<p>以修改项目相关配置为例：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span><span style="color:#f92672">server</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">port</span>: <span style="color:#ae81ff">9090</span> <span style="color:#75715e"># 项目启动端口</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">servlet</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">context-path</span>: <span style="color:#ae81ff">/root</span> <span style="color:#75715e"># 站点虚拟根路径</span>
+</span></span></code></pre></div><h2 id="获取配置信息">获取配置信息</h2>
+<p>有一个自定义类 <code>getConfigInfo</code> ：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">getConfigInfo</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> one;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String two;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">boolean</span> three;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>配置文件如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span><span style="color:#f92672">key</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">one</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">two</span>: <span style="color:#ae81ff">er</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">three</span>: <span style="color:#66d9ef">true</span>
+</span></span></code></pre></div><p>需要获取配置信息时，使用 <code>@Value</code> 注解：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">getConfigInfo</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Value</span>(<span style="color:#e6db74">&#34;${key.one}&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> one;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Value</span>(<span style="color:#e6db74">&#34;${key.two}&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String two;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Value</span>(<span style="color:#e6db74">&#34;${key.three}&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">boolean</span> three;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>如果字段名太多呢？显然它们都有一个共同的前缀 <code>key</code> 。那么就可以使用 <code>@ConfigurationProperties</code> 注解：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@ConfigurationProperties</span>(prefix <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;key&#34;</span>) <span style="color:#75715e">// prefix 的值是共同前缀</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">getConfigInfo</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> one;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String two;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">boolean</span> three;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>使用该注解来<strong>自动获取键值</strong>的前提是类中的<strong>属性名</strong>与配置文件中的<strong>键名</strong>一致。</p>
+<p>参考文章：<a href="https://docs.spring.io/spring-boot/appendix/application-properties/index.html#appendix.application-properties">Spring 官方文档：Common Application Properties</a></p>
+
+</main>
+
+  <footer>
+  
+  
+  <hr/>
+  © 2026 xici&rsquo;s Web Note. Powered by <a href="https://gohugo.io">Hugo</a>.
+  
+  </footer>
+  </body>
+</html>

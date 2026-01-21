@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>修复 git 没有 http 模块的问题 | 8ebb82&#39;s Web Note</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true });
+</script>
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/posts/">文章</a></li>
+      
+      <li><a href="/tags/">标签</a></li>
+      
+      <li><a href="/categories/">分类</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+    <h1>
+        <span class="title">
+            修复 git 没有 http 模块的问题
+        </span>
+    </h1>
+    
+    <h2 class="date">2025/04/17</h2>
+    <p class="description">fatal: Unable to find remote helper for &#39;http&#39;</p>
+</div>
+
+<main>
+    <h2 id="问题">问题</h2>
+<p>在阿里云的 ECS 服务器上，使用系统自带软件包管理器安装的 git 执行 <code>git clone</code> 命令，报错：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-plaintext" data-lang="plaintext"><span style="display:flex;"><span>fatal: Unable to find remote helper for &#39;http&#39;
+</span></span></code></pre></div><h2 id="排查">排查</h2>
+<p>使用命令查看 git 的可执行文件在哪：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git --exec-path
+</span></span></code></pre></div><p>输出：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>/usr/local/tools/git/git-2.9.5/libexec/git-core
+</span></span></code></pre></div><p>查看该目录下是否有 <code>git-remote-http</code> 等文件：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ls /usr/local/tools/git/git-2.9.5/libexec/git-core | grep remote
+</span></span></code></pre></div><p>发现没有。说明缺少对应的文件，导致无法通过 http clone。</p>
+<h2 id="解决">解决</h2>
+<p>需要重新编译 git 。</p>
+<p>首先下载 git 源码。这里以 <code>git-2.9.5</code> 为例。</p>
+<p>下载完成后解压，进入源代码目录。</p>
+<p>依次执行以下命令：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>./configure --prefix<span style="color:#f92672">=</span>/usr/local/git 
+</span></span><span style="display:flex;"><span>make <span style="color:#f92672">&amp;&amp;</span> make install
+</span></span></code></pre></div><p>这些命令会重新编译 git ，输出文件到 <code>/usr/local/git</code> 目录。并且在 <code>/usr/local/git/libexec/git-core/</code> 目录下生成 <code>git-remote-http</code> 等文件。</p>
+<p>之后在环境变量中添加自行编译的 git ：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-plaintext" data-lang="plaintext"><span style="display:flex;"><span>export PATH=$PATH:/usr/local/git/bin
+</span></span><span style="display:flex;"><span>export PATH=$PATH: /usr/local/git/libexec/git-core
+</span></span></code></pre></div><p>刷新环境变量：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>source .bashrc
+</span></span></code></pre></div><p>再次执行 <code>git clone</code> 命令，已经可以正常使用。</p>
+<hr>
+<p>参考文章</p>
+<p><a href="https://www.cnblogs.com/kl-22510/p/16576633.html">博客园：流沙的河在召唤</a></p>
+
+</main>
+
+  <footer>
+  
+  
+  <hr/>
+  © 2026 8ebb82&rsquo;s Web Note. Powered by <a href="https://gohugo.io">Hugo</a>.
+  
+  </footer>
+  </body>
+</html>

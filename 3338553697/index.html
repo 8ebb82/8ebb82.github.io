@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>新建博客时自动以时间命名文件 | web note by hugo</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true });
+</script>
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/posts/">文章</a></li>
+      
+      <li><a href="/tags/">标签</a></li>
+      
+      <li><a href="/categories/">分类</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">新建博客时自动以时间命名文件</span></h1>
+
+<h2 class="date">2025/03/31</h2>
+</div>
+
+<main>
+<h1 id="配置-js-脚本">配置 js 脚本</h1>
+<p>在 blog 根目录下新建文件 <code>new_post_with_date.js</code> ：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">exec</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;child_process&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">moment</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;moment&#39;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 获取当前日期时间，格式为 &#39;YYYY-MM-DD-HH-mm-ss&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">dateTime</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">moment</span>().<span style="color:#a6e22e">format</span>(<span style="color:#e6db74">&#39;YYYY-MM-DD-HH-mm-ss&#39;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 定义文章标题
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">title</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">dateTime</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 执行 Hexo new 命令创建新文章
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">exec</span>(<span style="color:#e6db74">`hexo new &#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">title</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;`</span>, (<span style="color:#a6e22e">error</span>, <span style="color:#a6e22e">stdout</span>, <span style="color:#a6e22e">stderr</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">error</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">error</span>(<span style="color:#e6db74">`执行出错: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">error</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">stdout</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">stderr</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">error</span>(<span style="color:#e6db74">`标准错误: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">stderr</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><p>之后安装 <code>moment</code> 库来处理时间和日期：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>npm install monent
+</span></span></code></pre></div><h1 id="新建博客">新建博客</h1>
+<p>这样新建博客需要使用 <code>node new_post_with_date.js</code> 命令，生成的文件自动以当前时间命名。</p>
+<p>可以修改 <code>new_post_with_date.js</code> 文件来自定义生成的文件名。</p>
+
+</main>
+
+  <footer>
+  
+  
+  </footer>
+  </body>
+</html>
+

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Gitlab.https on web note by hugo</title>
+    <link>http://localhost:1313/tags/gitlab.https/</link>
+    <description>Recent content in Gitlab.https on web note by hugo</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 19 May 2025 20:34:44 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/gitlab.https/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>为 gitlab ce 开启 https</title>
+      <link>http://localhost:1313/3635669452/</link>
+      <pubDate>Mon, 19 May 2025 20:34:44 +0800</pubDate>
+      <guid>http://localhost:1313/3635669452/</guid>
+      <description>&lt;p&gt;停用 gitlab 自带的 nginx，统一使用外部 nginx 进行代理。&lt;/p&gt;&#xA;&lt;p&gt;相关链接：&lt;/p&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://hellogitlab.com/CI/gitlab/X_centos7_install_gitlab_with_external_nginx#%E5%90%AF%E5%8A%A8gitlab%E5%92%8Cnginx%E6%9C%8D%E5%8A%A1&#34;&gt;简明教程&lt;/a&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://gitlab.com/gitlab-org/gitlab-recipes/-/tree/26948d710648a15d486a9a012abb8de31e99c10e/web-server/nginx&#34;&gt;gitlab ce 官方 nginx 配置文件&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

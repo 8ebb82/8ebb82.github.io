@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>常用控件 | xici&#39;s Web Note</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true });
+</script>
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/posts/">文章</a></li>
+      
+      <li><a href="/tags/">标签</a></li>
+      
+      <li><a href="/categories/">分类</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+    <h1>
+        <span class="title">
+            常用控件
+        </span>
+    </h1>
+    
+    <h2 class="date">2025/03/20</h2>
+    
+</div>
+
+<main>
+    <h1 id="listview">ListView</h1>
+<p>包含一个 List 的视图。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&lt;ListView</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">android:id=</span><span style="color:#e6db74">&#34;@+id/listView&#34;</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">android:layout_width=</span><span style="color:#e6db74">&#34;match_parent&#34;</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">android:layout_height=</span><span style="color:#e6db74">&#34;match_parent&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p>List 中的子项，也就是每个数据项，可以有自己的布局。</p>
+<p>一般使用集合来存储 List 中的数据。但是集合中的数据是无法直接传递给 List 的，需要通过实现 Adapter （适配器）来实现。这里以 <code>ArrayAdapter</code> 为例，它可以通过泛型来指定要适配的数据类型。</p>
+<p>集合定义：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">val</span> data = listof(
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;data1&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;data2&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;data3&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><p>为 List 绑定 Adapter：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">val</span> adapter = ArrayAdapter&lt;String&gt;(<span style="color:#66d9ef">this</span>, android.<span style="color:#a6e22e">R</span>.layout.simple_list_item_1, <span style="color:#66d9ef">data</span>)
+</span></span><span style="display:flex;"><span>listView.adapter = adapter
+</span></span></code></pre></div><p>{% note info %}</p>
+<p><code>listview</code> 是控件引用。下文同理。</p>
+<p>{% endnote %}</p>
+<p><code>this</code> 是当前活动的实例，<code>android.R.layout.simple_list_item_1</code> 是安卓内置的布局文件，里面只有一个 <code>TextView</code>。</p>
+<h2 id="自定义-listview-的子项">自定义 ListView 的子项</h2>
+<ul>
+<li>创建自定义子项的<strong>布局文件</strong>。</li>
+<li>创建保存数据的<strong>实体类</strong>，作为适配器的适配类型。</li>
+<li>创建自定义的<strong>适配器类</strong>，可以继承自 <code>ArrayAdapter</code>，也可以继承自别的适配器。</li>
+<li>在自定义的适配器类中<strong>重写</strong> <code>getView</code> 方法，该方法在每个数据项被滚动到屏幕内时被调用。</li>
+</ul>
+<div class="mermaid">
+    
+graph TD
+A[自定义的子项布局文件]
+B[保存数据的实体类]
+C[自定义的适配器实现类]
+D{getView方法}
+
+A -->|加载布局| D
+B -->|加载数据| D
+D -->|属于| C
+
+</div>
+<p><code>getView</code> 方法里要做什么？</p>
+<ul>
+<li>为子项加载布局，并获得其引用（<code>view</code>）</li>
+<li>获取子项布局中的数据对象</li>
+<li>获取当前子项的实体类实例</li>
+<li>填充数据</li>
+<li>返回设置完毕的 <code>view</code></li>
+</ul>
+<h2 id="提升-listview-的性能">提升 ListView 的性能</h2>
+<p>在调用 <code>getView</code> 方法时：</p>
+<ul>
+<li>每次都重新加载子项布局，无论其之前是否被加载过。</li>
+<li>每次都需要调用 <code>findViewById</code> 来获取控件的引用。</li>
+</ul>
+<p><code>getView</code> 方法的定义：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">override</span> <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">getView</span>(position: Int, convertView: View?, parent: ViewGroup): View {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// code ...
+</span></span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>其中有一个参数 <code>convertView</code> 用于缓存已加载的布局。只要在每次调用 <code>getView</code> 方法时判断是否存在布局的缓存即可。</p>
+<p>为了解决重复获取子项引用的问题，在适配器类中创建一个 <code>ViewHolder</code> 子类：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">inner</span> ViewHolder(<span style="color:#66d9ef">val</span> yourView: View)
+</span></span></code></pre></div><p>用于对布局控件进行缓存。操作逻辑也和 <code>convertView</code> 类似。不过 <code>ViewHolder</code> 作为 <code>View</code> 的附加数据被使用。也就是说只要布局有缓存，那么控件引用也有缓存。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span>view.tag  = viewHolder; <span style="color:#75715e">// 新建 View 实例时添加附加数据
+</span></span></span><span style="display:flex;"><span>viewHolder = view.tag <span style="color:#66d9ef">as</span> ViewHolder; <span style="color:#75715e">// 从缓存的 View 实例中获取附加数据
+</span></span></span></code></pre></div><div class="mermaid">
+    
+graph TD
+  getview[getView方法]
+  
+  getview --> 判断布局{布局已缓存？}
+
+  判断布局 --> |是| 加载缓存布局[加载缓存布局]
+
+  判断布局 --> |否| 重新加载布局[重新加载布局]
+
+</div>
+<h2 id="listview-的点击事件">ListView 的点击事件</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">val</span> yourList = ArrayList&lt;item&gt;() <span style="color:#75715e">// 数据源
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// code...
+</span></span></span><span style="display:flex;"><span>listView.setOnItemClickListener { parent, view, position, id <span style="color:#f92672">-&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">val</span> item = yourList[position] <span style="color:#75715e">// 如果定义了数组，可以通过下标引用的方式获取子项实例对象
+</span></span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Toast</span>.makeText(<span style="color:#66d9ef">this</span>, item.name, <span style="color:#a6e22e">Toast</span>.LENGTH_SHORT).show()
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>如果有不需要使用的参数，可以使用<strong>下划线</strong>代替：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span>listView.setOnItemClickListener { _, _, position, _ <span style="color:#f92672">-&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">val</span> item = yourList[position]
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Toast</span>.makeText(<span style="color:#66d9ef">this</span>, item.name, <span style="color:#a6e22e">Toast</span>.LENGTH_SHORT).show()
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>但是要注意<strong>参数顺序不能改变</strong>。</p>
+<h1 id="recyclerview">RecyclerView</h1>
+<p><code>RecyclerView</code> 可以实现 <code>ListView</code> 的所有效果，并且更加强大。Google 官方也在推进使用 <code>RecyclerView</code> 来替代 <code>ListView</code>。</p>
+<p>同样的，需要在布局文件中引入。不同的是，<strong>RecyclerView 并不是内置在系统 SDK 当中的</strong>，需要把完整的包路径写出来：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;androidx.recyclerview.widget.RecyclerView</span>         
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">android:id=</span><span style="color:#e6db74">&#34;@+id/recyclerView&#34;</span>         
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">android:layout_width=</span><span style="color:#e6db74">&#34;match_parent&#34;</span>         
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">android:layout_height=</span><span style="color:#e6db74">&#34;match_parent&#34;</span> <span style="color:#f92672">/&gt;</span> 
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p>接下来准备适配器：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">yourAdapter</span>(<span style="color:#66d9ef">val</span> yourList: List&lt;yourDomain&gt;) : <span style="color:#a6e22e">RecyclerView</span>.Adapter&lt;yourAdapter.ViewHolder&gt;() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">inner</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ViewHolder</span>(view: View) : <span style="color:#a6e22e">RecyclerView</span>.ViewHolder(view) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 获取控件引用
+</span></span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">onCreateViewHolder</span>(parent: ViewGroup, viewType: Int): ViewHolder {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 为子项绑定布局并返回 ViewHolder 实例
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> view = <span style="color:#a6e22e">LayoutInflater</span>.from(parent.context).inflate(<span style="color:#a6e22e">R</span>.layout.yourItemLayout, parent, <span style="color:#66d9ef">false</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> ViewHolder(view)
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 每个子项被滚动到屏幕内的时候执行
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">onBindViewHolder</span>(holder: ViewHolder, position: Int) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> yourDomain = yourList[position]
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 设置控件内容
+</span></span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">getItemCount</span>() = yourList.size
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>之后在 <code>Activity</code> 中绑定适配器：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#75715e">// code ...
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">val</span> layoutManager = LinearLayoutManager(<span style="color:#66d9ef">this</span>) <span style="color:#75715e">// 创建线性布局管理器
+</span></span></span><span style="display:flex;"><span>recyclerView.layoutManager = layoutManager <span style="color:#75715e">// 绑定线性布局管理器，实现 ListView 的效果
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">val</span> adapter = yourAdapter(yourList)
+</span></span><span style="display:flex;"><span>recyclerView.adapter = adapter
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// code ...
+</span></span></span></code></pre></div><p>这样即可实现与 ListView 相同的效果。</p>
+<h2 id="实现横向排列和瀑布流">实现横向排列和瀑布流</h2>
+<p>ListView 只能实现纵向排列，但是 RecyclerView 可以<strong>实现横向排列</strong>。只需要在 <code>Activity</code> 中：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span>val layoutManager = LinearLayoutManager(this) // 创建线性布局管理器
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">+ layoutManager.orientation = LinearLayoutManager.HORIZONT // 设置为横向排列
+</span></span></span><span style="display:flex;"><span>recyclerView.layoutManager = layoutManager // 绑定线性布局管理器，实现 ListView 的效果
+</span></span></code></pre></div><p>{% note info 为什么这么轻松？ %}
+ListView 的布局排列由自己管理。</p>
+<p>RecyclerView 将这个工作交给了 LayoutManager。</p>
+<p>LayoutManager 制定了一套可扩展的<strong>布局排列接口</strong>，子类只要按照接口的规范来实现，就能定制出各种不同排列方式的布局。</p>
+<p>{% endnote %}</p>
+<p>除了 LinearLayoutManager 之外，RecyclerView 还提供了 <code>GridLayoutManager</code> 和 <code>StaggeredGridLayoutManager</code> 这两种内置的布局排列方式。分别用于实现<strong>网格布局</strong>和<strong>瀑布流布局</strong>。</p>
+<p><strong>实现瀑布流</strong>布局同样只需要在 <code>Activity</code> 中：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#a6e22e">+ val layoutManager = StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL) // 创建瀑布流布局管理器
+</span></span></span><span style="display:flex;"><span>recyclerView.layoutManager = layoutManager // 绑定线性布局管理器，实现 ListView 的效果
+</span></span></code></pre></div><h2 id="recyclerview-的点击事件">RecyclerView 的点击事件</h2>
+<p>RecyclerView 并没有像 ListView 那样提供 <code>setOnItemClickListener()</code> 这样的注册监听器方法，需要手动实现。</p>
+<p>{% note info 为什么没有？ %}</p>
+<p>ListView 在点击事件上的处理并不人性化。setOnItemClickListener() 方法注册的是子项的点击事件，但如果需要点击<strong>子项里某一个具体的按钮</strong>呢？虽然 ListView 也能做到，但是实现起来就相对比较麻烦。</p>
+<p>为此，RecyclerView 摒弃了子项点击事件的监听器，让所有的点击事件都由具体的 View 去注册。<del>疑似推卸责任（bushi）</del></p>
+<p>{% endnote %}</p>
+
+</main>
+
+  <footer>
+  
+  
+  <hr/>
+  © 2026 xici&rsquo;s Web Note. Powered by <a href="https://gohugo.io">Hugo</a>.
+  
+  </footer>
+  </body>
+</html>

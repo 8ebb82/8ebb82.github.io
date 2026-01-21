@@ -1,0 +1,140 @@
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 1.5;
+}
+
+/* header and footer areas */
+.menu {
+  padding: 0;
+}
+
+.menu li {
+  display: inline-block;
+}
+
+.article-meta,
+.menu a {
+  text-decoration: none;
+  background: #eee;
+  padding: 6px;
+  border-radius: 5px;
+}
+
+.menu,
+.article-meta,
+footer {
+  text-align: center;
+}
+
+.title {
+  font-size: 1.1em;
+}
+
+footer a {
+  text-decoration: none;
+}
+
+hr {
+  border-style: dashed;
+  color: #ddd;
+}
+
+/*标题*/
+h1 {
+  font-size: 2em;
+  margin-bottom: 0.5em;
+  padding-left: 10px;
+  /* 留出一些空间给竖线 */
+  border-left: 5px solid #333;
+  /* 左边加一条 5 像素粗的深灰色竖线 */
+  line-height: 1;
+  /* 确保行高不会影响竖线的高度 */
+}
+
+h2 {
+  font-size: 1.5em;
+  margin-bottom: 0.3em;
+  padding-left: 8px;
+  /* 留出一些空间 */
+  border-left: 4px solid #555;
+  /* 左边加一条 4 像素粗的稍浅灰色竖线 */
+  line-height: 1;
+}
+
+h3 {
+  font-size: 1.2em;
+  margin-bottom: 0.2em;
+  padding-left: 6px;
+  /* 留出一些空间 */
+  border-left: 3px solid #777;
+  /* 左边加一条 3 像素粗的更浅灰色竖线 */
+  line-height: 1;
+}
+
+/*去除文章开头标题块内的左边竖线样式*/
+.article-meta h1,
+.article-meta h2,
+.article-meta h3 {
+  border-left: none;
+  padding-left: 0;
+}
+
+/* code */
+pre {
+  background: #e7e7e7;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  box-shadow: 5px 5px 5px #eee;
+  padding: 1em;
+  overflow-x: auto;
+}
+
+code {
+  border-radius: 3.5px;
+  padding: 3.5px;
+  background: #e7e7e7;
+}
+
+pre code {
+  background: none;
+}
+
+/* misc elements */
+img,
+iframe,
+video {
+  max-width: 100%;
+}
+
+main {
+  hyphens: auto;
+}
+
+blockquote {
+  background: #f9f9f9;
+  border-left: 5px solid #ccc;
+  padding: 3px 1em 3px;
+}
+
+table {
+  margin: auto;
+  border-top: 1px solid #666;
+  border-bottom: 1px solid #666;
+}
+
+table thead th {
+  border-bottom: 1px solid #ddd;
+}
+
+th,
+td {
+  padding: 5px;
+}
+
+thead,
+tfoot,
+tr:nth-child(even) {
+  background: #eeeeee71;
+}

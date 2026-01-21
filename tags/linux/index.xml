@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Linux on 8ebb82&#39;s Web Note</title>
+    <link>http://8ebb82.github.io/tags/linux/</link>
+    <description>Recent content in Linux on 8ebb82&#39;s Web Note</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 21 Jan 2026 14:06:46 +0800</lastBuildDate>
+    <atom:link href="http://8ebb82.github.io/tags/linux/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>linux 引导解析</title>
+      <link>http://8ebb82.github.io/1369009322/</link>
+      <pubDate>Wed, 21 Jan 2026 14:06:46 +0800</pubDate>
+      <guid>http://8ebb82.github.io/1369009322/</guid>
+      <description>&lt;h2 id=&#34;分区解释&#34;&gt;分区解释&lt;/h2&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;boot 分区：泛指存放机器启动所需文件的分区，比如内核和 efi 二进制文件等。一般指代 /boot 挂载的分区或者 /boot 文件夹。&lt;/li&gt;&#xA;&lt;li&gt;efi 分区：存放 efi 二进制文件的分区。格式为 fat32.&lt;/li&gt;&#xA;&lt;li&gt;esp：EFI System Partion. 存储了由 UEFI 固件启动的 UEFI 引导加载器、应用程序和驱动，是 UEFI 启动所必须的 &lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;。&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;efi 分区就是 esp, 狭义上的 boot 分区也是 esp.&lt;/p&gt;&#xA;&lt;h2 id=&#34;引导工具&#34;&gt;引导工具&lt;/h2&gt;&#xA;&lt;p&gt;主流的有 &lt;a href=&#34;https://wiki.archlinuxcn.org/wiki/GRUB&#34;&gt;GRUB&lt;/a&gt;,&lt;a href=&#34;https://wiki.archlinuxcn.org/wiki/Systemd-boot&#34;&gt;systemd-boot&lt;/a&gt;.&lt;/p&gt;&#xA;&lt;h3 id=&#34;grub&#34;&gt;GRUB&lt;/h3&gt;&#xA;&lt;p&gt;对于现代电脑 ( x86 及 x64, 使用 UEFI)，安装命令为：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;grub-install /dev/vda&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;其中 &lt;code&gt;/dev/vda&lt;/code&gt; 为需要安装引导的硬盘，而非分区。&lt;/p&gt;&#xA;&lt;p&gt;grub 会在硬盘上寻找 esp, 然后使用默认的安装路径：&lt;code&gt;/boot/efi&lt;/code&gt;. 也就是说 grub 默认你把 esp 挂载到&lt;code&gt;/boot/efi&lt;/code&gt;. 如果你的路径不符合 grub 规范，需要通过&lt;code&gt;--efi-directory&lt;/code&gt;指定 esp 的挂载点（文件夹）. 此外，对于其他架构的电脑，可以通过&lt;code&gt;--target&lt;/code&gt;指定架构，比如&lt;code&gt;i686-pc&lt;/code&gt;等。&lt;/p&gt;&#xA;&lt;p&gt;假设分区挂载方案为：&lt;/p&gt;&#xA;&lt;table&gt;&#xA;  &lt;thead&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;th style=&#34;text-align: center&#34;&gt;分区&lt;/th&gt;&#xA;          &lt;th style=&#34;text-align: center&#34;&gt;挂载点&lt;/th&gt;&#xA;          &lt;th style=&#34;text-align: center&#34;&gt;文件类型&lt;/th&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/thead&gt;&#xA;  &lt;tbody&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: center&#34;&gt;/dev/vda1&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: center&#34;&gt;/boot&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: center&#34;&gt;ext4&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: center&#34;&gt;/dev/vda2&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: center&#34;&gt;/boot/efi&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: center&#34;&gt;fat32&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: center&#34;&gt;/dev/vda3&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: center&#34;&gt;/&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: center&#34;&gt;ext4&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;p&gt;那么 grub 安装完成后，各个挂载点的文件目录结构如下：&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

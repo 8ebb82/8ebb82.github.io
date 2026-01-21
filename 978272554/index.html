@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>bean 对象 | xici&#39;s Web Note</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true });
+</script>
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/posts/">文章</a></li>
+      
+      <li><a href="/tags/">标签</a></li>
+      
+      <li><a href="/categories/">分类</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+    <h1>
+        <span class="title">
+            bean 对象
+        </span>
+    </h1>
+    
+    <h2 class="date">2025/04/01</h2>
+    
+</div>
+
+<main>
+    <h2 id="50933">5:09:33</h2>
+<h1 id="自动扫描-bean-对象">自动扫描 bean 对象</h1>
+<p>在 springboot 中，扫描 bean 的路径由注解 <code>@ComponentScan</code> 指定：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@ComponentScan</span>(basePackages <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;com.example.demo&#34;</span>)
+</span></span></code></pre></div><p>springboot 的启动类注解已经包含了这个注解：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@SpringBootConfiguration</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@EnableAutoConfiguration</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@ComponentScan</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#a6e22e">@interface</span> SpringBootApplication{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// code ...</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>springboot 默认扫描<strong>启动类所在的包及其子包</strong>。所以只需要在规定的路径内编写代码，即可自动扫描。</p>
+<p>如果希望可以扫描启动类的包之外的 bean ，可以为其添加注解 <code>@ComponentScan</code> 来指定。</p>
+<h1 id="bean-注册">bean 注册</h1>
+<p>基础的注册注解：</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: center">注解</th>
+          <th style="text-align: center">说明</th>
+          <th style="text-align: center">位置</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center"><code>@Component</code></td>
+          <td style="text-align: center">声明 bean 的基础注解</td>
+          <td style="text-align: center">不属于以下三类时使用</td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>@Controller</code></td>
+          <td style="text-align: center"><code>@Component</code> 的衍生注解</td>
+          <td style="text-align: center">标注于控制类</td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>@Service</code></td>
+          <td style="text-align: center"><code>@Component</code> 的衍生注解</td>
+          <td style="text-align: center">标注于业务类</td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>@Repository</code></td>
+          <td style="text-align: center"><code>@Component</code> 的衍生注解</td>
+          <td style="text-align: center">标注于数据访问类</td>
+      </tr>
+  </tbody>
+</table>
+<p>如果 bean 对象来自第三方，是无法使用 <code>@Component</code> 及其衍生注解的。</p>
+<h2 id="注册第三方-bean">注册第三方 bean</h2>
+<h3 id="bean-注解">@Bean 注解</h3>
+<p>可以在启动类中使用：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@springBootApplication</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SpringBootRegisterApplicationf</span>{
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">//将方法返回值交给Ioc容器管理，成为Ioc容器的bean对象 </span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Bean</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> OtherBean <span style="color:#a6e22e">otherBean</span>(){
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> OtherBean();
+</span></span><span style="display:flex;"><span>    } 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 验证注入是否成功</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 获取当前容器</span>
+</span></span><span style="display:flex;"><span>        ApplicationContext context <span style="color:#f92672">=</span> SpringApplication.<span style="color:#a6e22e">run</span>(SpringbootQuickstartApplication.<span style="color:#a6e22e">class</span>, args);
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 获取注入的 Bean</span>
+</span></span><span style="display:flex;"><span>        OtherBean otherBean <span style="color:#f92672">=</span> context.<span style="color:#a6e22e">getBean</span>(OtherBean.<span style="color:#a6e22e">class</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 如果没有报错说明注入成功</span>
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(otherBean);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>注入的 Bean 对象的默认名为方法名。可以自定义名字：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#f92672">- @Bean
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+ @Bean(name = &#34;yourName&#34;)
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+ @Bean(&#34;yourName&#34;)
+</span></span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span>// 获取注入的 Bean
+</span></span><span style="display:flex;"><span><span style="color:#f92672">- OtherBean otherBean = context.getBean(OtherBean.class);
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+ OtherBean otherBean = context.getBean(&#34;yourName&#34;);
+</span></span></span></code></pre></div><p>但是启动类不应该做这些工作。可以使用 <code>@Configuration</code> 来指定配置类。注意<strong>配置类需要在启动类所在包或其子包</strong>。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@Configuration</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SpringBootRegisterApplication</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Bean</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> OtherBean <span style="color:#a6e22e">otherBean</span>(){
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> OtherBean();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>使用同样的方法在启动类中验证。</p>
+<p>{% note info 需要使用 ioc 中已存在的对象？ %}</p>
+<p>如果方法的内部需要使用到ioc容器中已经存在的 bean 对象，那么只需要在方法上声明即可，springboot 会自动的注入：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@Configuration</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SpringBootRegisterApplication</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Bean</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> OtherBean <span style="color:#a6e22e">otherBean</span>(AnotherBean anotherBean){
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 无报错则获取成功</span>
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;otherBean:&#34;</span><span style="color:#f92672">+</span>anotherBean);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> OtherBean();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>{% endnote %}</p>
+<h3 id="import-注解">@Import 注解</h3>
+<p>如果<strong>配置类在启动类所在的包的外部</strong>呢？这时候可以使用 <code>@Import</code> 注解。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@SpringBootApplication</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Import</span>(yourConfigClass.<span style="color:#a6e22e">class</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SpringbootBeanInApplication</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) {
+</span></span><span style="display:flex;"><span>       <span style="color:#75715e">// code ...</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>当然也可以把配置类的完整类路径传递给 <code>@Import</code> 注解。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#f92672">- @Import(yourConfigClass.class)
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+ @Import(&#34;com.example.demo.config.yourConfigClass&#34;)
+</span></span></span></code></pre></div><p>有多个配置类需要传入时，可以写为数组的形式。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#f92672">- @Import(yourConfigClass.class)
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+ @Import(FirstConfigClass,SecondConfigClass,ThirdConfigClass)
+</span></span></span></code></pre></div><p>{% note info 配置类太多？ %}</p>
+<p>如果配置类太多，那么 <code>@Import</code> 注解就会很长。可以通过实现 <code>ImportSelector</code> 接口来解决。</p>
+<p>首先在 <code>resources</code> 目录下新建一个文件 <code>common.imports</code> ，里面写入需要导入的配置类的完整类路径：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-plaintext" data-lang="plaintext"><span style="display:flex;"><span>com.example.demo.config.FirstConfigClass
+</span></span><span style="display:flex;"><span>com.example.demo.config.SecondConfigClass
+</span></span><span style="display:flex;"><span>com.example.demo.config.ThirdConfigClass
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p>然后新建配置总类，实现 <code>ImportSelector</code> 接口：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CommonImportselector</span> <span style="color:#66d9ef">implements</span> Importselector {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String<span style="color:#f92672">[]</span> <span style="color:#a6e22e">selectImports</span>(AnnotationMetadata importingClassMetadata) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//读取配置文件的内容</span>
+</span></span><span style="display:flex;"><span>        List <span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;</span> imports <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;&gt;</span>();
+</span></span><span style="display:flex;"><span>        Inputstream is <span style="color:#f92672">=</span> CommonImportSelector.<span style="color:#a6e22e">class</span>.<span style="color:#a6e22e">getclassLoader</span>().<span style="color:#a6e22e">getResourceAsstream</span>(<span style="color:#e6db74">&#34;common.imports&#34;</span>);
+</span></span><span style="display:flex;"><span>        BufferedReader br <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BufferedReader(<span style="color:#66d9ef">new</span> InputstreamReader(is));
+</span></span><span style="display:flex;"><span>        String line <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> ((line <span style="color:#f92672">=</span> br.<span style="color:#a6e22e">readLine</span>()) <span style="color:#f92672">!=</span> nul)
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">// 添加到字符串数组中</span>
+</span></span><span style="display:flex;"><span>                imports.<span style="color:#a6e22e">add</span>(line);
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">catch</span><span style="color:#960050;background-color:#1e0010">（</span> IOException e<span style="color:#960050;background-color:#1e0010">）</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> RuntimeException(e);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">finally</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> (br <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>                        <span style="color:#75715e">// 关闭流</span>
+</span></span><span style="display:flex;"><span>                        br.<span style="color:#a6e22e">close</span>();
+</span></span><span style="display:flex;"><span>                    } <span style="color:#66d9ef">catch</span> (IoExceptione) {
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">throw</span> newRuntimeException(e);
+</span></span><span style="display:flex;"><span>                    }
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">// 返回字符串数组</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> imports.<span style="color:#a6e22e">toArray</span>(<span style="color:#66d9ef">new</span> String<span style="color:#f92672">[</span>0<span style="color:#f92672">]</span>);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>这样只需要在启动类中使用 <code>@Import(CommonImportSelector.class)</code> 即可。它会自动执行方法 <code>selectImports()</code> ，并获取其返回值作为配置类。</p>
+<p>{% note primary 不想每次都写配置总类的路径？ %}</p>
+<p>可以自定义一个包装注解。在 IDEA 中新建一个注解类：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@Target</span>(ElementType.<span style="color:#a6e22e">TYPE</span>) <span style="color:#75715e">// 表明该注解可以在类上使用</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Retention</span>(RetentionPolicy.<span style="color:#a6e22e">RUNTIME</span>) <span style="color:#75715e">// 表明该注解会保留在运行时阶段</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Import</span>(CommonImportSelector.<span style="color:#a6e22e">class</span>) <span style="color:#75715e">// 导入刚刚编写的配置总类</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#a6e22e">@interface</span> EnableCommonConfig {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 不用写其他内容</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>这样在启动类中只需要使用 <code>@EnableCommonConfig</code> 即可。</p>
+<p>{% endnote %}</p>
+<p>{%</p>
+
+</main>
+
+  <footer>
+  
+  
+  <hr/>
+  © 2026 xici&rsquo;s Web Note. Powered by <a href="https://gohugo.io">Hugo</a>.
+  
+  </footer>
+  </body>
+</html>

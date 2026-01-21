@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GitHub Pages &#43; hexo 部署个人博客 | xici&#39;s blog</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true });
+</script>
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">首页</a></li>
+      
+      <li><a href="/posts/">文章</a></li>
+      
+      <li><a href="/tags/">标签</a></li>
+      
+      <li><a href="/categories/">分类</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">GitHub Pages + hexo 部署个人博客</span></h1>
+
+<h2 class="date">2025/03/09</h2>
+</div>
+
+<main>
+<p>系统环境： windows11</p>
+<h1 id="安装-hexo">安装 hexo</h1>
+<p>先决条件： <code>nodejs</code> 和 <code>git</code> 环境，这里不赘述。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>npm install -g hexo-cli
+</span></span></code></pre></div><p>验证是否安装成功：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>hexo -v
+</span></span></code></pre></div><h1 id="本地部署">本地部署</h1>
+<p>初始化：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>hexo init &lt;floder&gt;
+</span></span><span style="display:flex;"><span>cd &lt;floder&gt;
+</span></span><span style="display:flex;"><span>npm install
+</span></span></code></pre></div><p>部署：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>hexo server
+</span></span></code></pre></div><p>在<a href="http://localhost:4000">localhost:4000</a>查看博客界面。</p>
+<h1 id="部署到-github-pages">部署到 github pages</h1>
+<h2 id="生成-sshkey">生成 sshkey</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ssh-keygen -r rsa -C <span style="color:#e6db74">&#34;youremail@example.com&#34;</span>
+</span></span></code></pre></div><p>一直按回车即可。如果提示 sshkey 已存在，选择覆盖（后果自负）。</p>
+<p>生成的密钥保存在 <code>C:\Users\yourusername\.ssh\id_rsa.pub</code> 这个文件中，下一步要用。</p>
+<h2 id="创建-github-pages-仓库">创建 github pages 仓库</h2>
+<p>在 github 上创建名为 <code>yourusername.github.io</code> 的仓库。</p>
+<p>在 github 上打开个人设置，在侧边栏找到 <code>SSH and GPG keys</code> ，点击它。之后在右边找到 <code>New SSH key</code> ，点击它。</p>
+<p><code>Title</code> 随意填写，<code>Key type</code> 选择 <code>Authentication Key</code> 。用任意文本编辑器打开上一步生成的密钥文件，复制里面所有内容，粘贴到 <code>key</code> 部分。然后点击 <code>Add SSH key</code> 确认。</p>
+<h2 id="填写仓库配置">填写仓库配置</h2>
+<p>回到本地博客的文件夹内，找到 <code>_config.yml</code> 这个文件，打开。</p>
+<p>在文件末尾找到：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span><span style="color:#f92672">deploy</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">type</span>: <span style="color:#e6db74">&#39;&#39;</span>
+</span></span></code></pre></div><p>改成：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span><span style="color:#f92672">deploy</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">type</span>: <span style="color:#ae81ff">git</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">repository</span>: <span style="color:#ae81ff">https://github.com/explame/explame.github.io.git</span> <span style="color:#75715e"># 你的仓库的 git 链接</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">branch</span>: <span style="color:#ae81ff">main</span> <span style="color:#75715e"># 也可能是 master ，具体查看自己的仓库。</span>
+</span></span></code></pre></div><h2 id="安装一键部署工具并上传">安装一键部署工具并上传</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>npm install hexo-deployer-git --save
+</span></span></code></pre></div><p>清理文件并上传：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>hexo clean <span style="color:#f92672">&amp;&amp;</span> hexo deploy
+</span></span></code></pre></div><p>片刻之后可以查看名为你的仓库名的URL，看看是否部署成功。</p>
+<p>例子： <a href="http://yourusername.github.io">http://yourusername.github.io</a></p>
+<hr>
+<p>参考文章</p>
+<p><a href="https://hexo.io/zh-cn/docs/github-pages.html">hexo官方文档</a></p>
+
+</main>
+
+  <footer>
+  
+  
+  </footer>
+  </body>
+</html>
+

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>开发日记 | xici&#39;s Web Note</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true });
+</script>
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/posts/">文章</a></li>
+      
+      <li><a href="/tags/">标签</a></li>
+      
+      <li><a href="/categories/">分类</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+    <h1>
+        <span class="title">
+            开发日记
+        </span>
+    </h1>
+    
+    <h2 class="date">2025/03/24</h2>
+    
+</div>
+
+<main>
+    <h2 id="00411">0:04:11</h2>
+<h1 id="后端生成并返回-excel-表格前端下载">后端生成并返回 excel 表格，前端下载</h1>
+<p>后端 Controller ：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@GetMapping</span>(<span style="color:#e6db74">&#34;/excel/{id}&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> ResponseEntity<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">byte</span><span style="color:#f92672">[]&gt;</span> <span style="color:#a6e22e">exportExcel</span>(<span style="color:#a6e22e">@PathVariable</span>(<span style="color:#e6db74">&#34;id&#34;</span>) Long id) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 1. 读取 Excel 模板</span>
+</span></span><span style="display:flex;"><span>        ClassPathResource resource <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ClassPathResource(<span style="color:#e6db74">&#34;template/bridge/bridgeSJ29.xlsx&#34;</span>);
+</span></span><span style="display:flex;"><span>        InputStream templateInputStream <span style="color:#f92672">=</span> resource.<span style="color:#a6e22e">getInputStream</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 2. 获取数据</span>
+</span></span><span style="display:flex;"><span>        BridgeSJ29 excelData <span style="color:#f92672">=</span> bridgeSJ29Service.<span style="color:#a6e22e">selectBridgeSJ29ById</span>(id);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (excelData <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> ResponseEntity.<span style="color:#a6e22e">notFound</span>().<span style="color:#a6e22e">build</span>();
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 处理时间格式</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// code...</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 3. 使用 ByteArrayOutputStream 代替本地文件</span>
+</span></span><span style="display:flex;"><span>        ByteArrayOutputStream outputStream <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ByteArrayOutputStream();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 4. 使用 EasyExcel 进行填充</span>
+</span></span><span style="display:flex;"><span>        EasyExcel.<span style="color:#a6e22e">write</span>(outputStream)
+</span></span><span style="display:flex;"><span>                .<span style="color:#a6e22e">withTemplate</span>(templateInputStream) <span style="color:#75715e">// 绑定模板</span>
+</span></span><span style="display:flex;"><span>                .<span style="color:#a6e22e">sheet</span>()  <span style="color:#75715e">// 选择第一个 Sheet</span>
+</span></span><span style="display:flex;"><span>                .<span style="color:#a6e22e">doFill</span>(excelData); <span style="color:#75715e">// 填充数据</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 5. 关闭流</span>
+</span></span><span style="display:flex;"><span>        templateInputStream.<span style="color:#a6e22e">close</span>();
+</span></span><span style="display:flex;"><span>        outputStream.<span style="color:#a6e22e">close</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 6. 获取字节数组</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> excelBytes <span style="color:#f92672">=</span> outputStream.<span style="color:#a6e22e">toByteArray</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 7. 设置 HTTP 头</span>
+</span></span><span style="display:flex;"><span>        HttpHeaders headers <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> HttpHeaders();
+</span></span><span style="display:flex;"><span>        headers.<span style="color:#a6e22e">add</span>(HttpHeaders.<span style="color:#a6e22e">CONTENT_DISPOSITION</span>, <span style="color:#e6db74">&#34;attachment; filename=bridgeSJ29_&#34;</span> <span style="color:#f92672">+</span> id <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.xlsx&#34;</span>);
+</span></span><span style="display:flex;"><span>        headers.<span style="color:#a6e22e">setContentType</span>(MediaType.<span style="color:#a6e22e">APPLICATION_OCTET_STREAM</span>);
+</span></span><span style="display:flex;"><span>        headers.<span style="color:#a6e22e">setContentLength</span>(excelBytes.<span style="color:#a6e22e">length</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 8. 返回字节数组，而不是 ByteArrayResource</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> ResponseEntity.<span style="color:#a6e22e">ok</span>()
+</span></span><span style="display:flex;"><span>                .<span style="color:#a6e22e">headers</span>(headers)
+</span></span><span style="display:flex;"><span>                .<span style="color:#a6e22e">body</span>(excelBytes);
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">catch</span> (Exception e) {
+</span></span><span style="display:flex;"><span>        e.<span style="color:#a6e22e">printStackTrace</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> ResponseEntity.<span style="color:#a6e22e">status</span>(500).<span style="color:#a6e22e">build</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>这样写返回的就是 excel 文件的 blob 数据，前端直接触发下载即可：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">/**导出Excel */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#a6e22e">handleExportExcel</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">response</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">exportExcel</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">rowid</span>);<span style="color:#75715e">// 后端返回的response就是一个blob对象，直接下载即可
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 创建 Blob 并触发下载
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">blob</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Blob</span>([<span style="color:#a6e22e">response</span>], { <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;application/octet-stream&#39;</span> });
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">link</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">createElement</span>(<span style="color:#e6db74">&#39;a&#39;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">link</span>.<span style="color:#a6e22e">href</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">URL</span>.<span style="color:#a6e22e">createObjectURL</span>(<span style="color:#a6e22e">blob</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">link</span>.<span style="color:#a6e22e">download</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;混凝土施工记录表SJ29_&#39;</span> <span style="color:#f92672">+</span> <span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;_.xlsx&#39;</span>;  <span style="color:#75715e">// 使用固定的文件名
+</span></span></span><span style="display:flex;"><span>    document.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">appendChild</span>(<span style="color:#a6e22e">link</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">link</span>.<span style="color:#a6e22e">click</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 清理Url对象
+</span></span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">URL</span>.<span style="color:#a6e22e">revokeObjectURL</span>(<span style="color:#a6e22e">link</span>.<span style="color:#a6e22e">href</span>);
+</span></span><span style="display:flex;"><span>    document.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">removeChild</span>(<span style="color:#a6e22e">link</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">$message</span>.<span style="color:#a6e22e">success</span>(<span style="color:#e6db74">&#39;Excel 下载成功！&#39;</span>);
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">error</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">error</span>(<span style="color:#e6db74">&#39;Excel 下载失败:&#39;</span>, <span style="color:#a6e22e">error</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">$message</span>.<span style="color:#a6e22e">error</span>(<span style="color:#e6db74">&#39;下载失败，请重试！&#39;</span>);
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">finally</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">loading</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>},
+</span></span></code></pre></div><p>之前写的时候 ai 一直说需要从 response 中读取头部来获取文件名，但是实际上返回的 response 没有头部。直接就是 blob 数据，连data部分都没有。所以直接下载即可。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// 创建 Blob 并触发下载
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">blob</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Blob</span>([<span style="color:#a6e22e">response</span>], { <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;application/octet-stream&#39;</span> });
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 之前一直写的是 response.data ，一直是 undefined
+</span></span></span></code></pre></div><p>参考文章：<a href="https://easyexcel.opensource.alibaba.com/docs/current/quickstart/fill#%E6%9C%80%E7%AE%80%E5%8D%95%E7%9A%84%E5%A1%AB%E5%85%85">EasyExcel 官方文档</a></p>
+<h1 id="后端返回的实体类字段名与定义的字段名不一致">后端返回的实体类字段名与定义的字段名不一致</h1>
+<h2 id="问题">问题</h2>
+<p>数据库中有数据，后端能接收到数据，但是前端web页面的表格中没有显示数据。</p>
+<h2 id="排查">排查</h2>
+<ul>
+<li>前端表格中对应的字段名均正确；</li>
+<li>后端实体类中对应的属性名均正确；</li>
+<li>数据库中对应的字段名均正确；</li>
+</ul>
+<h2 id="解决">解决</h2>
+<ol>
+<li>在前端中<strong>打印后端发送来的数据，发现与期望字段名不一致</strong>。比如期望<code>sgphb_wjj</code>，收到的却是<code>ssgxb_wjj</code>。</li>
+<li>在<strong>后端中查找相应字符串</strong>，发现实体类中的<code>getter</code>和<code>setter</code>方法的<strong>方法名与错误的字段名对应</strong>，方法体中的<strong>属性名与正确的字段名对应</strong>。猜测是<strong>方法名错误导致返回前端的字段名错误</strong>。</li>
+<li>修正方法名后，问题解决。</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/xici/blog-sources/main/images/20250407200502522.jpeg" alt="方法名对比"></p>
+<h2 id="原理">原理</h2>
+<p>截取部分AI解释如下。</p>
+<p><img src="https://raw.githubusercontent.com/xici/blog-sources/main/images/20250407200519258.jpeg" alt="AI 解释"></p>
+<p><img src="https://raw.githubusercontent.com/xici/blog-sources/main/images/20250407200537230.jpeg" alt="AI 解释反射机制"></p>
+<p>在这个过程中，当首字母之后连续的字母都是大写时，通常会将整个大写部分都视为一个整体，然后统一将首字母小写：</p>
+<p><code>SJ28Item1List -&gt; sj28Item1List</code></p>
+<h2 id="jsonproperty注解"><code>@JsonProperty</code> 注解</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> com.fasterxml.jackson.annotation.JsonProperty;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Example</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@JsonProperty</span>(<span style="color:#e6db74">&#34;customName&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> String name;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">getName</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> name;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setName</span>(String name) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">name</span> <span style="color:#f92672">=</span> name;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>在上述代码中，尽管 <code>getter</code> 和 <code>setter</code> 方法遵循 Java Bean 规范，但是由于使用了 <code>@JsonProperty(&quot;customName&quot;)</code> 注解，该属性在序列化后会被命名为 <code>customName</code> 而不是 <code>name</code>。</p>
+<p>总之，一般情况下是根据 Java Bean 规范，由 <code>getter</code> 和 <code>setter</code> 方法名来决定最终返回给前端的字段名，但可以通过注解等方式来进行自定义修改，避免受到方法名的限制。</p>
+<h1 id="easyexcel-实现列表填充">EasyExcel 实现列表填充</h1>
+<p>这里填充的是图片。模板内的占位符为 <code>{.imageCell}</code> 。</p>
+<p>实体类内的静态类：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@Getter</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Setter</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Image</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> WriteCellData<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;</span> imageCell;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">/*
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    * 为了实现单张图片的格式化（例如占多个单元格等），使用 ImageData 。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    * EasyExcel 根据一个 WriteCellData 对象来对一个单元格进行操作。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    * */</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Image</span>(URL imageURL) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">imageCell</span> <span style="color:#f92672">=</span> createWriteCellData(imageURL);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> WriteCellData<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">createWriteCellData</span>(URL url) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        WriteCellData<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;</span> cellData <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> WriteCellData<span style="color:#f92672">&lt;&gt;</span>(); <span style="color:#75715e">// 单元格操作对象</span>
+</span></span><span style="display:flex;"><span>        ImageData imageData <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ImageData(); <span style="color:#75715e">// 图片数据对象</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        imageData.<span style="color:#a6e22e">setImage</span>(downloadImage(url));
+</span></span><span style="display:flex;"><span>        imageData.<span style="color:#a6e22e">setImageType</span>(ImageData.<span style="color:#a6e22e">ImageType</span>.<span style="color:#a6e22e">PICTURE_TYPE_PNG</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        imageData.<span style="color:#a6e22e">setRelativeFirstRowIndex</span>(0);<span style="color:#75715e">// 距离占位符单元格 0 行</span>
+</span></span><span style="display:flex;"><span>        imageData.<span style="color:#a6e22e">setRelativeFirstColumnIndex</span>(0); <span style="color:#75715e">// 距离占位符单元格 0 列</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 以上两句可以不写，毕竟本来就要填充到占位符的地方</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        imageData.<span style="color:#a6e22e">setRelativeLastRowIndex</span>(0); <span style="color:#75715e">// 图片占 1 行</span>
+</span></span><span style="display:flex;"><span>        imageData.<span style="color:#a6e22e">setRelativeLastColumnIndex</span>(1); <span style="color:#75715e">// 图片横向占 2 列</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        cellData.<span style="color:#a6e22e">setImageDataList</span>(List.<span style="color:#a6e22e">of</span>(imageData));<span style="color:#75715e">// 将图片数据对象放入一个不可变列表中，并将这个列表返回给单元格操作对象</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> cellData;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> <span style="color:#a6e22e">downloadImage</span>(URL url) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 下载图片保存为二进制文件</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>填充列表</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// 构建 ExcelWriter 对象，并禁用自动关闭流，实现多次操作</span>
+</span></span><span style="display:flex;"><span>ExcelWriter excelWriter <span style="color:#f92672">=</span> EasyExcel.<span style="color:#a6e22e">write</span>(outputStream)
+</span></span><span style="display:flex;"><span>        .<span style="color:#a6e22e">withTemplate</span>(templateInputStream)
+</span></span><span style="display:flex;"><span>        .<span style="color:#a6e22e">autoCloseStream</span>(<span style="color:#66d9ef">false</span>)
+</span></span><span style="display:flex;"><span>        .<span style="color:#a6e22e">build</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 构建默认的 WriteSheet（这里假设只有一个 sheet）</span>
+</span></span><span style="display:flex;"><span>WriteSheet sheet <span style="color:#f92672">=</span> EasyExcel.<span style="color:#a6e22e">writerSheet</span>().<span style="color:#a6e22e">build</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 使用 List&lt;Image&gt; 让 EasyExcel 按行填充</span>
+</span></span><span style="display:flex;"><span>List<span style="color:#f92672">&lt;</span>SJ24.<span style="color:#a6e22e">Image</span><span style="color:#f92672">&gt;</span> imageList <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;&gt;</span>();
+</span></span><span style="display:flex;"><span>imageList.<span style="color:#a6e22e">add</span>(<span style="color:#66d9ef">new</span> SJ24.<span style="color:#a6e22e">Image</span>(<span style="color:#66d9ef">new</span> URL(excelData.<span style="color:#a6e22e">getCrackDistributionMap15</span>()))); <span style="color:#75715e">// 第一张图片</span>
+</span></span><span style="display:flex;"><span>imageList.<span style="color:#a6e22e">add</span>(<span style="color:#66d9ef">new</span> SJ24.<span style="color:#a6e22e">Image</span>(<span style="color:#66d9ef">new</span> URL(excelData.<span style="color:#a6e22e">getCrackDistributionMap25</span>()))); <span style="color:#75715e">// 第二张图片</span>
+</span></span><span style="display:flex;"><span>excelWriter.<span style="color:#a6e22e">fill</span>(imageList, sheet);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 填充文字数据</span>
+</span></span><span style="display:flex;"><span>excelWriter.<span style="color:#a6e22e">fill</span>(excelData,sheet);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 结束写入，刷新数据到流中</span>
+</span></span><span style="display:flex;"><span>excelWriter.<span style="color:#a6e22e">finish</span>();
+</span></span></code></pre></div><p>参考文章：<a href="https://easyexcel.opensource.alibaba.com/docs/current/quickstart/fill#%E5%A1%AB%E5%85%85%E5%88%97%E8%A1%A8">EasyExcel 官方文档</a></p>
+<h1 id="element-ui-前端时间选择问题">Element UI 前端时间选择问题</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>&lt;<span style="color:#f92672">el-form-item</span> <span style="color:#a6e22e">label</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;施工日期&#34;</span> <span style="color:#a6e22e">prop</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;constructionTime&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>    &lt;<span style="color:#f92672">el-date-picker</span> <span style="color:#a6e22e">clearable</span> <span style="color:#a6e22e">v-model</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;form.constructionTime&#34;</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;date&#34;</span> <span style="color:#a6e22e">placeholder</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;请选择施工日期&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">format</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;yyyy/MM/dd&#34;</span> <span style="color:#a6e22e">value-format</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;yyyy/MM/dd&#34;</span> /&gt;
+</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">el-form-item</span>&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">el-form-item</span> <span style="color:#a6e22e">label</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;开始时间&#34;</span> <span style="color:#a6e22e">prop</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;startTime&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>    &lt;<span style="color:#f92672">el-time-picker</span> <span style="color:#a6e22e">clearable</span> <span style="color:#a6e22e">v-model</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;form.startTime&#34;</span> <span style="color:#a6e22e">placeholder</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;请选择开始时间&#34;</span> <span style="color:#a6e22e">disabled-seconds</span> <span style="color:#a6e22e">format</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;H:mm&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">value-format</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;H:mm&#34;</span> /&gt;
+</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">el-form-item</span>&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">el-form-item</span> <span style="color:#a6e22e">label</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;结束时间&#34;</span> <span style="color:#a6e22e">prop</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;endTime&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>    &lt;<span style="color:#f92672">el-time-picker</span> <span style="color:#a6e22e">clearable</span> <span style="color:#a6e22e">v-model</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;form.endTime&#34;</span> <span style="color:#a6e22e">placeholder</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;请选择结束时间&#34;</span> <span style="color:#a6e22e">disabled-seconds</span> <span style="color:#a6e22e">format</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;H:mm&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">value-format</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;H:mm&#34;</span> /&gt;
+</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">el-form-item</span>&gt;
+</span></span></code></pre></div><p>以<strong>施工日期</strong>字段为例，因为设置了 <code>value-format</code> 属性，所以若<strong>数据库里</strong>的对应字段的格式与<strong>该属性规定</strong>的格式不符，前端选择时就会报错。</p>
+<p>比如数据库返回的字段值是 <code>yyyy-MM-dd</code> ， <code>value-format</code> 属性设置为 <code>yyyy/MM/dd</code> ，则在操作这个组件的时候就会报错：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-plaintext" data-lang="plaintext"><span style="display:flex;"><span>TypeError: date.getFullYear is not a function ...
+</span></span><span style="display:flex;"><span>TypeError: date.getHours is not a function ...
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p>{% note info 为什么是 <code>date</code> ？ %}
+可能是组件无法解析绑定值的格式的时候默认解析为 <code>Date</code> 对象了吧。
+{% endnote %}</p>
+<p>所以选择将数据库中有关时间的字段设置为 <code>varchar</code> 类型，方便更改格式。（ <code>date</code> 类型的字段的格式只能是 <code>yyyy-MM-dd</code> ）</p>
+<p>参考文章：[Element UI 官方文档](<a href="https://element.eleme.cn/#/zh-CN/component/date-picker#r">https://element.eleme.cn/#/zh-CN/component/date-picker#r</a></p>
+
+</main>
+
+  <footer>
+  
+  
+  <hr/>
+  © 2026 xici&rsquo;s Web Note. Powered by <a href="https://gohugo.io">Hugo</a>.
+  
+  </footer>
+  </body>
+</html>

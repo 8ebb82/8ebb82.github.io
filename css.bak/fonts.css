@@ -1,0 +1,9 @@
+body {
+  font-family: "Noto Sans Mono CJK SC","Droid Sans Fallback", Arial, sans-serif;
+  font-size: 100%;
+}
+
+code {
+  font-family: Consolas, "Lucida Console", Monaco, monospace;
+  font-size: 90%;
+}
